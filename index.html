@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreetStyle Store - Koszyk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* [ZACHOWUJEMY WCZEŚNIEJSZE STYLE] */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #fafafa; color: #1a1a1a; padding-bottom: 100px; }
+        header { background-color: rgba(0, 0, 0, 0.95); color: #fff; padding: 25px 50px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-weight: 900; text-transform: uppercase; }
+        nav { display: flex; gap: 10px; }
+        nav a { color: #bbb; text-decoration: none; font-weight: 700; padding: 10px 20px; border-radius: 20px; transition: 0.3s; }
+        nav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        
+        /* Akcent dla aktywnego koszyka w menu */
+        #cart-counter { background: #ff3333; color: white; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-size: 0.8rem; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .product-card { background: #fff; border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
+        .product-image { width: 100%; height: 200px; background: #eee; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #ccc; font-size: 2rem; }
+        .price { font-size: 1.5em; color: #ff3333; font-weight: 900; margin: 10px 0; }
+        button { background-color: #ff3333; color: #fff; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; text-transform: uppercase; width: 100%; transition: 0.3s; }
+        button:hover { background-color: #cc0000; }
+
+        /* --- NOWE STYLE DLA KOSZYKA --- */
+        #cart-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 20px;
+            display: none; /* Ukryty, dopóki coś nie zostanie dodane */
+            z-index: 2000;
+        }
+        #cart-panel h3 { margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; align-items: center; }
+        .remove-btn { background: none; color: #ff3333; width: auto; padding: 0 5px; font-size: 0.8rem; cursor: pointer; border: 1px solid #ff3333; border-radius: 5px; }
+        .total-price { font-weight: 900; font-size: 1.2rem; border-top: 2px solid #eee; margin-top: 15px; padding-top: 10px; text-align: right; }
+        .checkout-btn { background: #000; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>STREETSTYLE</h1>
+    <nav>
+        <a href="#buty">Buty</a>
+        <a href="#koszulki">Koszulki</a>
+        <a href="#" onclick="toggleCart()">Koszyk <span id="cart-counter">0</span></a>
+    </nav>
+</header>
+
+<div class="container">
+    <h2 id="buty">Obuwie</h2>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-image">AM90</div>
+            <h3>Nike Air Max 90</h3>
+            <div class="price">499.99</div>
+            <button onclick="addToCart('Nike Air Max 90', 499.99)">Dodaj do koszyka</button>
+        </div>
+        <div class="product-card">
+            <div class="product-image">UB</div>
+            <h3>Adidas UltraBoost</h3>
+            <div class="price">549.00</div>
+            <button onclick="addToCart('Adidas UltraBoost', 549.00)">Dodaj do koszyka</button>
+        </div>
+    </div>
+
+    <h2 id="koszulki">Koszulki</h2>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-image">BTEE</div>
+            <h3>T-Shirt Czarny</h3>
+            <div class="price">89.00</div>
+            <button onclick="addToCart('T-Shirt Czarny', 89.00)">Dodaj do koszyka</button>
+        </div>
+    </div>
+</div>
+
+<div id="cart-panel">
+    <h3>Twój Koszyk</h3>
+    <div id="cart-items-list">
+        </div>
+    <div class="total-price">
+        Suma: <span id="total-amount">0.00</span> zł
+    </div>
+    <button class="checkout-btn" onclick="checkout()">PRZEJDŹ DO PŁATNOŚCI</button>
+</div>
+
+<script>
+    let cart = [];
+    let total = 0;
+
+    function addToCart(name, price) {
+        // Dodaj do tablicy
+        cart.push({ name: name, price: price });
+        total += price;
+
+        updateCartUI();
+        
+        // Pokaż panel koszyka przy pierwszym dodaniu
+        document.getElementById('cart-panel').style.display = 'block';
+    }
+
+    function removeItem(index) {
+        total -= cart[index].price;
+        cart.splice(index, 1);
+        
+        if(cart.length === 0) {
+            document.getElementById('cart-panel').style.display = 'none';
+        }
+        
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        // Licznik w menu
+        document.getElementById('cart-counter').innerText = cart.length;
+
+        // Lista w panelu
+        const listElement = document.getElementById('cart-items-list');
+        listElement.innerHTML = ''; // wyczyść starą listę
+
+        cart.forEach((item, index) => {
+            listElement.innerHTML += `
+                <div class="cart-item">
+                    <span>${item.name}</span>
+                    <span>${item.price.toFixed(2)} zł <button class="remove-btn" onclick="removeItem(${index})">X</button></span>
+                </div>
+            `;
+        });
+
+        // Suma
+        document.getElementById('total-amount').innerText = total.toFixed(2);
+    }
+
+    function toggleCart() {
+        const panel = document.getElementById('cart-panel');
+        panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function checkout() {
+        if(cart.length > 0) {
+            alert("Dziękujemy za zakupy! Do zapłaty: " + total.toFixed(2) + " zł.");
+            cart = [];
+            total = 0;
+            updateCartUI();
+            document.getElementById('cart-panel').style.display = 'none';
+        } else {
+            alert("Koszyk jest pusty!");
+        }
+    }
+</script>
+
+</body>
+</html>
