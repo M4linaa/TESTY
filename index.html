@@ -16,7 +16,6 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        /* Style dla siatki w tle (grid overlay) */
         .bg-grid {
             background-size: 30px 30px;
             background-image: 
@@ -24,7 +23,6 @@
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
 
-        /* Aktywna zakładka */
         .nav-link.active {
             background-color: rgba(16, 185, 129, 0.1);
             color: #10b981;
@@ -36,14 +34,12 @@
             color: #e5e7eb;
         }
 
-        /* Przycisk filtra aktywny */
         .filter-btn.active, .time-btn.active {
             background-color: #0284c7;
             color: #ffffff;
             border-color: #38bdf8;
         }
 
-        /* Ukrywanie nieaktywnych sekcji */
         .tab-content {
             display: none;
         }
@@ -51,7 +47,6 @@
             display: block;
         }
 
-        /* Customowy pasek przewijania */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -67,7 +62,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden bg-grid">
 
-    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI (TRADINGVIEW TICKER TAPE) -->
+    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI -->
     <header class="h-10 bg-[#090d14] border-b border-gray-800/60 flex items-center overflow-hidden shrink-0 z-20 select-none">
         <div class="tradingview-widget-container w-full">
             <div class="tradingview-widget-container__widget"></div>
@@ -90,13 +85,29 @@
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    <!-- MOBILNY PRZYCISK HAMBURGERA (Widoczny tylko na małych ekranach) -->
+    <div class="lg:hidden bg-[#080c14] border-b border-gray-800/60 p-3 flex items-center justify-between z-30">
+        <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold text-xs">
+                ZPP
+            </div>
+            <span class="text-white font-bold text-xs tracking-wider">TERMINAL ZPP</span>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-gray-300 hover:text-white focus:outline-none p-1">
+            <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
+        </button>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden relative">
         
+        <!-- BACKDROP DLA MOBILNEGO MENU -->
+        <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden transition-opacity"></div>
+
         <!-- 2. BOCZNE MENU (SIDEBAR) -->
-        <aside class="w-64 bg-[#080c14]/90 border-r border-gray-800/60 flex flex-col justify-between overflow-y-auto shrink-0 p-4 select-none">
+        <aside id="sidebar" class="fixed lg:relative top-0 left-0 h-full w-64 bg-[#080c14] lg:bg-[#080c14]/90 border-r border-gray-800/60 flex flex-col justify-between overflow-y-auto shrink-0 p-4 select-none z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
             <div>
-                <!-- LOGO -->
-                <div class="mb-6 flex flex-col items-center border-b border-gray-800/60 pb-4">
+                <!-- LOGO (Dla desktop) -->
+                <div class="hidden lg:flex mb-6 flex-col items-center border-b border-gray-800/60 pb-4">
                     <div class="w-10 h-10 rounded-full border-2 border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold mb-2 shadow-lg shadow-cyan-500/10">
                         ZPP
                     </div>
@@ -183,8 +194,8 @@
             </div>
         </aside>
 
-        <!-- 3. GŁÓWNY OBSZAR ROBOCZY (TREŚĆ ZAKŁADEK) -->
-        <main class="flex-1 overflow-y-auto p-8 relative">
+        <!-- 3. GŁÓWNY OBSZAR ROBOCZY -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
             
             <!-- 1. Dashboard -->
             <section id="tab-dashboard" class="tab-content">
@@ -195,38 +206,37 @@
 
             <!-- 2. Kalendarz Ekonomiczny -->
             <section id="tab-kalendarz" class="tab-content active">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-white mb-1">Kalendarz ekonomiczny</h2>
-                        <p class="text-sm text-gray-500">Kluczowe wydarzenia makro na ten tydzień</p>
+                        <h2 class="text-xl md:text-2xl font-bold text-white mb-1">Kalendarz ekonomiczny</h2>
+                        <p class="text-xs md:text-sm text-gray-500">Kluczowe wydarzenia makro na ten tydzień</p>
                     </div>
 
-                    <!-- Statystyki Tygodnia -->
-                    <div class="flex items-center gap-3 text-xs">
-                        <div class="bg-[#0d131f] border border-gray-800 px-3 py-1.5 rounded-lg">
-                            <span class="text-gray-400">Tydzień:</span>
-                            <span id="stat-total" class="font-bold text-white ml-1">0 wydarzeń</span>
+                    <!-- Statystyki Tygodnia & Filtry w kontenerze mobilnym -->
+                    <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
+                        <div class="flex items-center gap-3 text-xs w-full sm:w-auto">
+                            <div class="bg-[#0d131f] border border-gray-800 px-3 py-1.5 rounded-lg flex-1 sm:flex-none text-center">
+                                <span class="text-gray-400">Tydzień:</span>
+                                <span id="stat-total" class="font-bold text-white ml-1">0 wydarzeń</span>
+                            </div>
+                            <div class="bg-[#0d131f] border border-gray-800 px-3 py-1.5 rounded-lg flex-1 sm:flex-none text-center">
+                                <span class="text-gray-400">Wysoki wpływ:</span>
+                                <span id="stat-high" class="font-bold text-rose-400 ml-1">0</span>
+                            </div>
                         </div>
-                        <div class="bg-[#0d131f] border border-gray-800 px-3 py-1.5 rounded-lg">
-                            <span class="text-gray-400">Wysoki wpływ:</span>
-                            <span id="stat-high" class="font-bold text-rose-400 ml-1">0</span>
-                        </div>
-                    </div>
 
-                    <!-- Filtry -->
-                    <div class="flex flex-wrap items-center gap-2">
                         <!-- Zakres Czasu -->
-                        <div class="flex items-center bg-[#0d131f] p-1 rounded-lg border border-gray-800 text-xs">
-                            <button onclick="setTimeFilter('week')" id="time-week" class="time-btn active px-3 py-1.5 rounded-md font-medium transition-all">Cały tydzień</button>
-                            <button onclick="setTimeFilter('today')" id="time-today" class="time-btn px-3 py-1.5 rounded-md font-medium hover:bg-gray-800 transition-all">Dziś</button>
-                            <button onclick="setTimeFilter('tomorrow')" id="time-tomorrow" class="time-btn px-3 py-1.5 rounded-md font-medium hover:bg-gray-800 transition-all">Jutro</button>
+                        <div class="flex items-center bg-[#0d131f] p-1 rounded-lg border border-gray-800 text-xs w-full sm:w-auto justify-between">
+                            <button onclick="setTimeFilter('week')" id="time-week" class="time-btn active flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium transition-all">Cały tydzień</button>
+                            <button onclick="setTimeFilter('today')" id="time-today" class="time-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium hover:bg-gray-800 transition-all">Dziś</button>
+                            <button onclick="setTimeFilter('tomorrow')" id="time-tomorrow" class="time-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium hover:bg-gray-800 transition-all">Jutro</button>
                         </div>
 
                         <!-- Poziom Wpływu -->
-                        <div class="flex items-center bg-[#0d131f] p-1 rounded-lg border border-gray-800 text-xs">
-                            <button onclick="setImpactFilter('all')" id="filter-all" class="filter-btn active px-3 py-1.5 rounded-md font-medium transition-all">Wszystkie</button>
-                            <button onclick="setImpactFilter('medium')" id="filter-medium" class="filter-btn px-3 py-1.5 rounded-md font-medium text-amber-400 hover:bg-amber-500/10 transition-all">Średni+</button>
-                            <button onclick="setImpactFilter('high')" id="filter-high" class="filter-btn px-3 py-1.5 rounded-md font-medium text-rose-400 hover:bg-rose-500/10 transition-all">Wysoki</button>
+                        <div class="flex items-center bg-[#0d131f] p-1 rounded-lg border border-gray-800 text-xs w-full sm:w-auto justify-between">
+                            <button onclick="setImpactFilter('all')" id="filter-all" class="filter-btn active flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium transition-all">Wszystkie</button>
+                            <button onclick="setImpactFilter('medium')" id="filter-medium" class="filter-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium text-amber-400 hover:bg-amber-500/10 transition-all">Średni+</button>
+                            <button onclick="setImpactFilter('high')" id="filter-high" class="filter-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium text-rose-400 hover:bg-rose-500/10 transition-all">Wysoki</button>
                         </div>
                     </div>
                 </div>
@@ -259,8 +269,27 @@
         </main>
     </div>
 
-    <!-- SKRYPT DO OBSŁUGI DANYCH Z SORTOWANIEM CZASOWYM I PRZEŁĄCZANIEM TYGODNIA -->
+    <!-- SKRYPTY OBSŁUGI DANYCH I MOBILNEGO MENU -->
     <script>
+        // Obsługa wysuwania paska bocznego na urządzeniach mobilnych
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-xmark');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+                menuIcon.classList.remove('fa-xmark');
+                menuIcon.classList.add('fa-bars');
+            }
+        }
+
         function switchTab(tabId) {
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
@@ -273,13 +302,17 @@
 
             const activeButton = document.getElementById('btn-' + tabId);
             if (activeButton) activeButton.classList.add('active');
+
+            // Zwiń sidebar na telefonie po wybraniu opcji
+            if (window.innerWidth < 1024) {
+                toggleMobileSidebar();
+            }
         }
 
         let calendarData = [];
         let activeImpact = 'all';
         let activeTime = 'week';
 
-        // Wyznacza zakres dat dla aktualnego tygodnia (Poniedziałek - Niedziela)
         function getCurrentWeekRange() {
             const now = new Date();
             const dayOfWeek = now.getDay();
@@ -309,7 +342,6 @@
             const toStr = formatDate(sunday);
 
             try {
-                // Pobieranie danych z otwieranego źródła rynkowego (DailyFX API proxy)
                 const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(`https://www.dailyfx.com/api/v1/calendar?startDate=${fromStr}&endDate=${toStr}`)}`);
                 if(!res.ok) throw new Error("Błąd pobierania danych");
 
@@ -341,9 +373,7 @@
                 calendarData = generateSortedWeekData(monday);
             }
 
-            // KLUCZOWE: Rygorystyczne sortowanie chronologiczne od najwcześniejszego do najpóźniejszego wydarzenia
             calendarData.sort((a, b) => a.timestamp - b.timestamp);
-
             renderCalendar();
         }
 
@@ -370,7 +400,6 @@
                     const ev = sampleEvents[Math.floor(Math.random() * sampleEvents.length)];
                     const curr = currencies[Math.floor(Math.random() * currencies.length)];
                     
-                    // Generowanie losowych, ale usystematyzowanych godzin
                     const hour = Math.floor(Math.random() * 15) + 7;
                     const min = Math.random() > 0.5 ? 30 : 0;
                     
@@ -401,14 +430,12 @@
             tomorrowDate.setDate(tomorrowDate.getDate() + 1);
             const tomorrowStr = formatDate(tomorrowDate);
 
-            // Filtrowanie czasowe
             let filtered = calendarData.filter(item => {
                 if (activeTime === 'today') return item.date === todayStr;
                 if (activeTime === 'tomorrow') return item.date === tomorrowStr;
                 return true;
             });
 
-            // Filtrowanie wg wpływu
             filtered = filtered.filter(item => {
                 if (activeImpact === 'high') return item.impact === 'high';
                 if (activeImpact === 'medium') return item.impact === 'high' || item.impact === 'medium';
@@ -426,7 +453,6 @@
                 return;
             }
 
-            // Grupowanie według dat z zachowaniem kolejności czasowej
             const grouped = {};
             filtered.forEach(item => {
                 if (!grouped[item.date]) grouped[item.date] = [];
@@ -434,7 +460,6 @@
             });
 
             Object.keys(grouped).sort().forEach(dateStr => {
-                // Upewniamy się, że wewnątrz każdego dnia godziny idą po kolei
                 const dayEvents = grouped[dateStr].sort((a, b) => a.timestamp - b.timestamp);
                 
                 const dateObj = new Date(dateStr + 'T00:00:00');
@@ -446,43 +471,43 @@
                 dayEvents.forEach(item => {
                     let badge = '';
                     if (item.impact === 'high') {
-                        badge = `<span class="px-2.5 py-1 text-[11px] font-semibold rounded bg-rose-950/80 text-rose-400 border border-rose-800/50">Wysoki</span>`;
+                        badge = `<span class="px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded bg-rose-950/80 text-rose-400 border border-rose-800/50">Wysoki</span>`;
                     } else if (item.impact === 'medium') {
-                        badge = `<span class="px-2.5 py-1 text-[11px] font-semibold rounded bg-amber-950/80 text-amber-400 border border-amber-800/50">Średni</span>`;
+                        badge = `<span class="px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded bg-amber-950/80 text-amber-400 border border-amber-800/50">Średni</span>`;
                     } else {
-                        badge = `<span class="px-2.5 py-1 text-[11px] font-semibold rounded bg-gray-800/80 text-gray-400 border border-gray-700/50">Niski</span>`;
+                        badge = `<span class="px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded bg-gray-800/80 text-gray-400 border border-gray-700/50">Niski</span>`;
                     }
 
                     rowsHtml += `
                         <tr class="hover:bg-gray-800/30 transition-colors border-b border-gray-800/30 last:border-0">
-                            <td class="py-3 px-5 text-gray-300 font-mono text-xs font-semibold">${item.time}</td>
-                            <td class="py-3 px-5 font-bold text-gray-200">
+                            <td class="py-3 px-3 sm:px-5 text-gray-300 font-mono text-xs font-semibold whitespace-nowrap">${item.time}</td>
+                            <td class="py-3 px-3 sm:px-5 font-bold text-gray-200 whitespace-nowrap">
                                 <span class="inline-block px-1.5 py-0.5 rounded bg-gray-800 text-gray-300 font-mono text-xs">${item.currency}</span>
                             </td>
-                            <td class="py-3 px-5 text-gray-200 font-medium">${item.event}</td>
-                            <td class="py-3 px-5 text-center">${badge}</td>
-                            <td class="py-3 px-5 text-right text-gray-300 font-mono text-xs">${item.forecast}</td>
-                            <td class="py-3 px-5 text-right text-gray-400 font-mono text-xs">${item.previous}</td>
+                            <td class="py-3 px-3 sm:px-5 text-gray-200 font-medium min-w-[200px] sm:min-w-0">${item.event}</td>
+                            <td class="py-3 px-3 sm:px-5 text-center whitespace-nowrap">${badge}</td>
+                            <td class="py-3 px-3 sm:px-5 text-right text-gray-300 font-mono text-xs whitespace-nowrap">${item.forecast}</td>
+                            <td class="py-3 px-3 sm:px-5 text-right text-gray-400 font-mono text-xs whitespace-nowrap">${item.previous}</td>
                         </tr>
                     `;
                 });
 
                 const dayBlock = `
                     <div class="bg-[#090d14] rounded-xl border border-gray-800/80 overflow-hidden shadow-xl">
-                        <div class="bg-[#0d131f] px-5 py-2.5 border-b border-gray-800 flex items-center justify-between">
-                            <span class="text-sm font-semibold text-gray-200">${formattedDayLabel}</span>
+                        <div class="bg-[#0d131f] px-4 sm:px-5 py-2.5 border-b border-gray-800 flex items-center justify-between">
+                            <span class="text-xs sm:text-sm font-semibold text-gray-200">${formattedDayLabel}</span>
                             <span class="text-xs text-gray-500 font-medium">(${dayEvents.length})</span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-[#0c1019] text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-800/60">
+                            <table class="w-full text-left text-xs sm:text-sm">
+                                <thead class="bg-[#0c1019] text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-800/60">
                                     <tr>
-                                        <th class="py-2.5 px-5 font-semibold w-24">Czas</th>
-                                        <th class="py-2.5 px-5 font-semibold w-24">Waluta</th>
-                                        <th class="py-2.5 px-5 font-semibold">Wydarzenie</th>
-                                        <th class="py-2.5 px-5 font-semibold text-center w-28">Wpływ</th>
-                                        <th class="py-2.5 px-5 font-semibold text-right w-28">Prognoza</th>
-                                        <th class="py-2.5 px-5 font-semibold text-right w-28">Poprzednio</th>
+                                        <th class="py-2.5 px-3 sm:px-5 font-semibold">Czas</th>
+                                        <th class="py-2.5 px-3 sm:px-5 font-semibold">Waluta</th>
+                                        <th class="py-2.5 px-3 sm:px-5 font-semibold">Wydarzenie</th>
+                                        <th class="py-2.5 px-3 sm:px-5 font-semibold text-center">Wpływ</th>
+                                        <th class="py-2.5 px-3 sm:px-5 font-semibold text-right">Prognoza</th>
+                                        <th class="py-2.5 px-3 sm:px-5 font-semibold text-right">Poprzednio</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -510,7 +535,6 @@
             renderCalendar();
         }
 
-        // Automatyczne sprawdzanie zmiany tygodnia co 30 minut
         setInterval(fetchEconomicCalendar, 1800000);
 
         document.addEventListener('DOMContentLoaded', () => {
