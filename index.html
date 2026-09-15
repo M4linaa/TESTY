@@ -34,7 +34,7 @@
             color: #e5e7eb;
         }
 
-        .filter-btn.active, .time-btn.active {
+        .filter-btn.active, .time-btn.active, .journal-tab-btn.active {
             background-color: #0284c7;
             color: #ffffff;
             border-color: #38bdf8;
@@ -85,7 +85,7 @@
         </div>
     </header>
 
-    <!-- MOBILNY PRZYCISK HAMBURGERA (Widoczny tylko na małych ekranach) -->
+    <!-- MOBILNY PRZYCISK HAMBURGERA -->
     <div class="lg:hidden bg-[#080c14] border-b border-gray-800/60 p-3 flex items-center justify-between z-30">
         <div class="flex items-center gap-2">
             <div class="w-7 h-7 rounded-full border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold text-xs">
@@ -197,14 +197,14 @@
         <!-- 3. GŁÓWNY OBSZAR ROBOCZY -->
         <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
             
-            <!-- 1. Dashboard -->
+            <!-- Dashboard -->
             <section id="tab-dashboard" class="tab-content">
                 <h2 class="text-2xl font-bold text-white mb-2">Dashboard</h2>
                 <p class="text-sm text-gray-500 mb-6">Główny pulpit nawigacyjny.</p>
-                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Tutaj wkleimy treść dla: Dashboard ]</div>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść dla: Dashboard ]</div>
             </section>
 
-            <!-- 2. Kalendarz Ekonomiczny -->
+            <!-- Kalendarz Ekonomiczny -->
             <section id="tab-kalendarz" class="tab-content active">
                 <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6">
                     <div>
@@ -212,7 +212,6 @@
                         <p class="text-xs md:text-sm text-gray-500">Kluczowe wydarzenia makro na ten tydzień</p>
                     </div>
 
-                    <!-- Statystyki Tygodnia & Filtry w kontenerze mobilnym -->
                     <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
                         <div class="flex items-center gap-3 text-xs w-full sm:w-auto">
                             <div class="bg-[#0d131f] border border-gray-800 px-3 py-1.5 rounded-lg flex-1 sm:flex-none text-center">
@@ -225,14 +224,12 @@
                             </div>
                         </div>
 
-                        <!-- Zakres Czasu -->
                         <div class="flex items-center bg-[#0d131f] p-1 rounded-lg border border-gray-800 text-xs w-full sm:w-auto justify-between">
                             <button onclick="setTimeFilter('week')" id="time-week" class="time-btn active flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium transition-all">Cały tydzień</button>
                             <button onclick="setTimeFilter('today')" id="time-today" class="time-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium hover:bg-gray-800 transition-all">Dziś</button>
                             <button onclick="setTimeFilter('tomorrow')" id="time-tomorrow" class="time-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium hover:bg-gray-800 transition-all">Jutro</button>
                         </div>
 
-                        <!-- Poziom Wpływu -->
                         <div class="flex items-center bg-[#0d131f] p-1 rounded-lg border border-gray-800 text-xs w-full sm:w-auto justify-between">
                             <button onclick="setImpactFilter('all')" id="filter-all" class="filter-btn active flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium transition-all">Wszystkie</button>
                             <button onclick="setImpactFilter('medium')" id="filter-medium" class="filter-btn flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-md font-medium text-amber-400 hover:bg-amber-500/10 transition-all">Średni+</button>
@@ -241,11 +238,91 @@
                     </div>
                 </div>
 
-                <!-- Kontener Kalendarza z Nagłówkami Dni -->
                 <div id="calendar-container" class="space-y-6">
                     <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-12 text-center text-gray-500">
                         <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-emerald-500"></i>
                         <p>Pobieranie i sortowanie wydarzeń...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sekcja Dziennika Tradingu MT5 -->
+            <section id="tab-dziennik" class="tab-content">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-1">Dziennik tradingu</h2>
+                        <p id="journal-counter-text" class="text-xs text-gray-400">0 otwartych · 0 zamkniętych</p>
+                    </div>
+                    <button onclick="openNewTradeModal()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Nowy trade</span>
+                    </button>
+                </div>
+
+                <!-- Nawigacja podzakładek -->
+                <div class="flex items-center gap-1 bg-[#090d14] p-1 rounded-xl border border-gray-800/80 w-fit mb-6 text-xs sm:text-sm">
+                    <button onclick="switchJournalTab('open')" id="jtab-btn-open" class="journal-tab-btn active px-4 py-1.5 rounded-lg font-medium transition-all">Otwarte (0)</button>
+                    <button onclick="switchJournalTab('closed')" id="jtab-btn-closed" class="journal-tab-btn px-4 py-1.5 rounded-lg font-medium transition-all text-gray-400 hover:text-white">Zamknięte (0)</button>
+                    <button onclick="switchJournalTab('stats')" id="jtab-btn-stats" class="journal-tab-btn px-4 py-1.5 rounded-lg font-medium transition-all text-gray-400 hover:text-white">Statystyki</button>
+                </div>
+
+                <!-- OTWARTY TRADING -->
+                <div id="jtab-content-open" class="journal-subtab">
+                    <div id="open-trades-container" class="bg-[#090d14] rounded-xl border border-gray-800/80 overflow-hidden shadow-xl"></div>
+                </div>
+
+                <!-- ZAMKNIĘTY TRADING -->
+                <div id="jtab-content-closed" class="journal-subtab hidden">
+                    <div id="closed-trades-container" class="bg-[#090d14] rounded-xl border border-gray-800/80 overflow-hidden shadow-xl"></div>
+                </div>
+
+                <!-- STATYSTYKI -->
+                <div id="jtab-content-stats" class="journal-subtab hidden space-y-4">
+                    <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-6 text-center shadow-xl">
+                        <div class="text-xs text-gray-400 mb-1">Łączny P&L</div>
+                        <div id="stat-total-pnl" class="text-3xl font-extrabold text-emerald-400">+0,00$</div>
+                        <div id="stat-total-count" class="text-xs text-gray-500 mt-1">0 trade'ów</div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Win Rate</div>
+                            <div id="stat-winrate" class="text-xl font-bold text-white">0,0%</div>
+                            <div id="stat-winrate-sub" class="text-[11px] text-gray-500 mt-0.5">0W / 0L</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Profit Factor</div>
+                            <div id="stat-pf" class="text-xl font-bold text-white">0,00</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">avg win / avg loss</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Śr. wygrana</div>
+                            <div id="stat-avg-win" class="text-xl font-bold text-emerald-400">+0,00$</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">na trade</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Śr. strata</div>
+                            <div id="stat-avg-loss" class="text-xl font-bold text-rose-500">-0,00$</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">na trade</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Najlepszy trade</div>
+                            <div id="stat-best-trade" class="text-xl font-bold text-emerald-400">+0,00$</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Najgorszy trade</div>
+                            <div id="stat-worst-trade" class="text-xl font-bold text-rose-500">0,00$</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Max seria W</div>
+                            <div id="stat-max-wins" class="text-xl font-bold text-emerald-400">0</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">z rzędu</div>
+                        </div>
+                        <div class="bg-[#090d14] rounded-xl border border-gray-800/80 p-4">
+                            <div class="text-xs text-gray-400 mb-1">Max seria L</div>
+                            <div id="stat-max-losses" class="text-xl font-bold text-rose-500">0</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">z rzędu</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -261,7 +338,6 @@
             <section id="tab-likwidacje" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Likwidacje</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-kalkulator-pozycji" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Kalkulator pozycji</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-kalkulatory-inwestycyjne" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Kalkulatory inwestycyjne</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
-            <section id="tab-dziennik" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Dziennik tradingu</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-checklista" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Checklista tradera</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-korelacje" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Mapa korelacji</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-tracker" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Tracker portfela</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
@@ -269,9 +345,84 @@
         </main>
     </div>
 
-    <!-- SKRYPTY OBSŁUGI DANYCH I MOBILNEGO MENU -->
+    <!-- MODAL: NOWY TRADE -->
+    <div id="modal-new-trade" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#0b0f19] border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold text-white mb-4">Nowy trade</h3>
+            <form id="form-new-trade" onsubmit="saveNewTrade(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Para / Aktyw (np. XAUUSD, EURUSD, BTCUSD)</label>
+                    <input type="text" id="trade-symbol" required placeholder="XAUUSD, EURUSD..." class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white uppercase focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Kierunek</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setDirection('LONG')" id="btn-dir-long" class="py-2.5 rounded-lg font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/50">LONG</button>
+                        <button type="button" onclick="setDirection('SHORT')" id="btn-dir-short" class="py-2.5 rounded-lg font-bold bg-gray-800/50 text-gray-400 border border-gray-700">SHORT</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Entry</label>
+                        <input type="number" step="any" id="trade-entry" required placeholder="0.00" class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Stop Loss</label>
+                        <input type="number" step="any" id="trade-sl" placeholder="0.00" class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Take Profit</label>
+                        <input type="number" step="any" id="trade-tp" placeholder="0.00" class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-gray-400 mb-1">Wolumen (Lot)</label>
+                        <input type="number" step="0.01" min="0.01" value="0.01" id="trade-size" required class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">Dźwignia MT5</label>
+                        <input type="number" value="500" id="trade-leverage" readonly class="w-full bg-[#06090e]/50 border border-gray-800/50 rounded-lg p-2.5 text-gray-400 font-mono cursor-not-allowed">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-1">Notatki (opcjonalnie)</label>
+                    <textarea id="trade-notes" rows="2" placeholder="Setup, reasoning, uwagi..." class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeNewTradeModal()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">Anuluj</button>
+                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-5 py-2 rounded-lg transition-all shadow-lg shadow-emerald-500/20">Dodaj trade</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ZAMKNIJ TRADE -->
+    <div id="modal-close-trade" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#0b0f19] border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold text-white mb-1">Zamknij trade</h3>
+            <p id="close-modal-info" class="text-xs text-gray-400 mb-4">XAUUSD LONG @ $4500.00</p>
+            
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-gray-400 mb-1">Cena zamknięcia</label>
+                    <input type="number" step="any" id="close-price-input" oninput="calculateModalPnl()" placeholder="0.00" class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="bg-[#06090e] border border-gray-800 rounded-xl p-4 text-center">
+                    <div class="text-gray-400 text-[11px] mb-1">P&L</div>
+                    <div id="close-modal-pnl" class="text-2xl font-extrabold text-emerald-400">+0,00$</div>
+                </div>
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeCloseTradeModal()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">Anuluj</button>
+                    <button type="button" onclick="confirmCloseTrade()" class="bg-amber-500 hover:bg-amber-600 text-black font-bold px-5 py-2 rounded-lg transition-all shadow-lg shadow-amber-500/20">Zamknij trade</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SKRYPTY APLIKACJI -->
     <script>
-        // Obsługa wysuwania paska bocznego na urządzeniach mobilnych
+        // --- 1. OBSŁUGA INTERFEJSU I NAWIGACJI ---
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
@@ -303,12 +454,12 @@
             const activeButton = document.getElementById('btn-' + tabId);
             if (activeButton) activeButton.classList.add('active');
 
-            // Zwiń sidebar na telefonie po wybraniu opcji
             if (window.innerWidth < 1024) {
                 toggleMobileSidebar();
             }
         }
 
+        // --- 2. OBSŁUGA KALENDARZA EKONOMICZNEGO ---
         let calendarData = [];
         let activeImpact = 'all';
         let activeTime = 'week';
@@ -535,10 +686,313 @@
             renderCalendar();
         }
 
+        // --- 3. OBSŁUGA DZIENNIKA TRADINGU MT5 ---
+        let trades = JSON.parse(localStorage.getItem('zpp_mt5_trades')) || [];
+        let selectedDirection = 'LONG';
+        let activeClosingTradeId = null;
+
+        const CONTRACT_SIZES = {
+            'XAUUSD': 100,
+            'XAGUSD': 5000,
+            'BTCUSD': 1,
+            'ETHUSD': 1,
+            'GER40': 1,
+            'US30': 1,
+            'NAS100': 1,
+            'DEFAULT': 100000
+        };
+
+        function saveTradesToStorage() {
+            localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
+            renderJournal();
+        }
+
+        function switchJournalTab(tab) {
+            document.querySelectorAll('.journal-tab-btn').forEach(b => {
+                b.classList.remove('active', 'text-white');
+                b.classList.add('text-gray-400');
+            });
+            document.querySelectorAll('.journal-subtab').forEach(c => c.classList.add('hidden'));
+
+            document.getElementById(`jtab-btn-${tab}`).classList.add('active', 'text-white');
+            document.getElementById(`jtab-btn-${tab}`).classList.remove('text-gray-400');
+            document.getElementById(`jtab-content-${tab}`).classList.remove('hidden');
+        }
+
+        function setDirection(dir) {
+            selectedDirection = dir;
+            const btnLong = document.getElementById('btn-dir-long');
+            const btnShort = document.getElementById('btn-dir-short');
+
+            if (dir === 'LONG') {
+                btnLong.className = 'py-2.5 rounded-lg font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/50';
+                btnShort.className = 'py-2.5 rounded-lg font-bold bg-gray-800/50 text-gray-400 border border-gray-700';
+            } else {
+                btnShort.className = 'py-2.5 rounded-lg font-bold bg-rose-500/20 text-rose-400 border border-rose-500/50';
+                btnLong.className = 'py-2.5 rounded-lg font-bold bg-gray-800/50 text-gray-400 border border-gray-700';
+            }
+        }
+
+        function openNewTradeModal() {
+            document.getElementById('modal-new-trade').classList.remove('hidden');
+        }
+
+        function closeNewTradeModal() {
+            document.getElementById('modal-new-trade').classList.add('hidden');
+        }
+
+        function saveNewTrade(e) {
+            e.preventDefault();
+            const symbol = document.getElementById('trade-symbol').value.toUpperCase().trim();
+            const entry = parseFloat(document.getElementById('trade-entry').value);
+            const sl = parseFloat(document.getElementById('trade-sl').value) || null;
+            const tp = parseFloat(document.getElementById('trade-tp').value) || null;
+            const size = parseFloat(document.getElementById('trade-size').value);
+            const notes = document.getElementById('trade-notes').value;
+
+            const newTrade = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }),
+                symbol,
+                direction: selectedDirection,
+                entry,
+                sl,
+                tp,
+                size,
+                leverage: 500,
+                notes,
+                status: 'OPEN',
+                closePrice: null,
+                pnl: 0
+            };
+
+            trades.unshift(newTrade);
+            saveTradesToStorage();
+            closeNewTradeModal();
+            document.getElementById('form-new-trade').reset();
+        }
+
+        function calculateMT5Pnl(trade, closePrice) {
+            const symbol = trade.symbol;
+            const contractSize = CONTRACT_SIZES[symbol] || CONTRACT_SIZES['DEFAULT'];
+            
+            let pnl = 0;
+            if (trade.direction === 'LONG') {
+                pnl = (closePrice - trade.entry) * trade.size * contractSize;
+            } else {
+                pnl = (trade.entry - closePrice) * trade.size * contractSize;
+            }
+            return pnl;
+        }
+
+        function openCloseModal(id) {
+            activeClosingTradeId = id;
+            const trade = trades.find(t => t.id === id);
+            if (!trade) return;
+
+            document.getElementById('close-modal-info').textContent = `${trade.symbol} ${trade.direction} @ $${trade.entry.toFixed(2)}`;
+            document.getElementById('close-price-input').value = trade.entry;
+            calculateModalPnl();
+            document.getElementById('modal-close-trade').classList.remove('hidden');
+        }
+
+        function closeCloseTradeModal() {
+            document.getElementById('modal-close-trade').classList.add('hidden');
+            activeClosingTradeId = null;
+        }
+
+        function calculateModalPnl() {
+            const trade = trades.find(t => t.id === activeClosingTradeId);
+            if (!trade) return;
+
+            const closePrice = parseFloat(document.getElementById('close-price-input').value) || trade.entry;
+            const pnl = calculateMT5Pnl(trade, closePrice);
+
+            const pnlEl = document.getElementById('close-modal-pnl');
+            const formatted = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '$';
+            pnlEl.textContent = formatted;
+            pnlEl.className = `text-2xl font-extrabold ${pnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}`;
+        }
+
+        function confirmCloseTrade() {
+            const trade = trades.find(t => t.id === activeClosingTradeId);
+            if (!trade) return;
+
+            const closePrice = parseFloat(document.getElementById('close-price-input').value);
+            if (isNaN(closePrice)) return;
+
+            trade.status = 'CLOSED';
+            trade.closePrice = closePrice;
+            trade.pnl = calculateMT5Pnl(trade, closePrice);
+
+            saveTradesToStorage();
+            closeCloseTradeModal();
+        }
+
+        function deleteTrade(id) {
+            trades = trades.filter(t => t.id !== id);
+            saveTradesToStorage();
+        }
+
+        function renderJournal() {
+            const openTrades = trades.filter(t => t.status === 'OPEN');
+            const closedTrades = trades.filter(t => t.status === 'CLOSED');
+
+            document.getElementById('journal-counter-text').textContent = `${openTrades.length} otwartych · ${closedTrades.length} zamkniętych`;
+            document.getElementById('jtab-btn-open').textContent = `Otwarte (${openTrades.length})`;
+            document.getElementById('jtab-btn-closed').textContent = `Zamknięte (${closedTrades.length})`;
+
+            // RENDEROWANIE OTWARTYCH
+            const openContainer = document.getElementById('open-trades-container');
+            if (openTrades.length === 0) {
+                openContainer.innerHTML = `<div class="p-12 text-center text-gray-500 text-sm">Brak otwartych pozycji</div>`;
+            } else {
+                let rowsHtml = '';
+                openTrades.forEach(t => {
+                    rowsHtml += `
+                        <tr class="border-b border-gray-800/40 hover:bg-gray-800/20 text-xs transition-colors">
+                            <td class="py-3 px-4 text-gray-400 font-mono">${t.date}</td>
+                            <td class="py-3 px-4 font-bold text-white">${t.symbol}</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded font-bold ${t.direction === 'LONG' ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50' : 'bg-rose-950/80 text-rose-400 border border-rose-800/50'}">${t.direction}</span></td>
+                            <td class="py-3 px-4 font-mono text-gray-200">$${t.entry.toFixed(2)}</td>
+                            <td class="py-3 px-4 font-mono text-rose-400">${t.sl ? '$' + t.sl.toFixed(2) : '-'}</td>
+                            <td class="py-3 px-4 font-mono text-emerald-400">${t.tp ? '$' + t.tp.toFixed(2) : '-'}</td>
+                            <td class="py-3 px-4 font-mono text-gray-300">${t.size.toFixed(4)}</td>
+                            <td class="py-3 px-4 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <button onclick="openCloseModal(${t.id})" class="text-amber-400 hover:text-amber-300 font-medium">Zamknij</button>
+                                    <button onclick="deleteTrade(${t.id})" class="text-rose-500 hover:text-rose-400">Usuń</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                openContainer.innerHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-[#0c1019] text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-800/60">
+                                <tr>
+                                    <th class="py-2.5 px-4 font-semibold">Data</th>
+                                    <th class="py-2.5 px-4 font-semibold">Para</th>
+                                    <th class="py-2.5 px-4 font-semibold">Kierunek</th>
+                                    <th class="py-2.5 px-4 font-semibold">Entry</th>
+                                    <th class="py-2.5 px-4 font-semibold">SL</th>
+                                    <th class="py-2.5 px-4 font-semibold">TP</th>
+                                    <th class="py-2.5 px-4 font-semibold">Size</th>
+                                    <th class="py-2.5 px-4 font-semibold text-right">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rowsHtml}</tbody>
+                        </table>
+                    </div>`;
+            }
+
+            // RENDEROWANIE ZAMKNIĘTYCH
+            const closedContainer = document.getElementById('closed-trades-container');
+            if (closedTrades.length === 0) {
+                closedContainer.innerHTML = `<div class="p-12 text-center text-gray-500 text-sm">Brak zamkniętych pozycji</div>`;
+            } else {
+                let rowsHtml = '';
+                closedTrades.forEach(t => {
+                    const pnlFormatted = (t.pnl >= 0 ? '+' : '') + t.pnl.toFixed(2) + '$';
+                    rowsHtml += `
+                        <tr class="border-b border-gray-800/40 hover:bg-gray-800/20 text-xs transition-colors">
+                            <td class="py-3 px-4 text-gray-400 font-mono">${t.date}</td>
+                            <td class="py-3 px-4 font-bold text-white">${t.symbol}</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded font-bold ${t.direction === 'LONG' ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50' : 'bg-rose-950/80 text-rose-400 border border-rose-800/50'}">${t.direction}</span></td>
+                            <td class="py-3 px-4 font-mono text-gray-200">$${t.entry.toFixed(2)}</td>
+                            <td class="py-3 px-4 font-mono text-gray-200">$${t.closePrice.toFixed(2)}</td>
+                            <td class="py-3 px-4 font-mono text-gray-300">${t.size.toFixed(4)}</td>
+                            <td class="py-3 px-4 font-mono font-bold ${t.pnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}">${pnlFormatted}</td>
+                            <td class="py-3 px-4 text-right">
+                                <button onclick="deleteTrade(${t.id})" class="text-rose-500 hover:text-rose-400">Usuń</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                closedContainer.innerHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-[#0c1019] text-[11px] uppercase tracking-wider text-gray-500 border-b border-gray-800/60">
+                                <tr>
+                                    <th class="py-2.5 px-4 font-semibold">Data</th>
+                                    <th class="py-2.5 px-4 font-semibold">Para</th>
+                                    <th class="py-2.5 px-4 font-semibold">Kierunek</th>
+                                    <th class="py-2.5 px-4 font-semibold">Entry</th>
+                                    <th class="py-2.5 px-4 font-semibold">Exit</th>
+                                    <th class="py-2.5 px-4 font-semibold">Size</th>
+                                    <th class="py-2.5 px-4 font-semibold">P&L</th>
+                                    <th class="py-2.5 px-4 font-semibold text-right">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rowsHtml}</tbody>
+                        </table>
+                    </div>`;
+            }
+
+            renderJournalStats(closedTrades);
+        }
+
+        function renderJournalStats(closedTrades) {
+            const totalPnl = closedTrades.reduce((acc, t) => acc + t.pnl, 0);
+            const wins = closedTrades.filter(t => t.pnl > 0);
+            const losses = closedTrades.filter(t => t.pnl < 0);
+
+            const winCount = wins.length;
+            const lossCount = losses.length;
+            const totalCount = closedTrades.length;
+
+            const winRate = totalCount > 0 ? ((winCount / totalCount) * 100).toFixed(1) : '0,0';
+            const sumWin = wins.reduce((acc, t) => acc + t.pnl, 0);
+            const sumLoss = Math.abs(losses.reduce((acc, t) => acc + t.pnl, 0));
+
+            const avgWin = winCount > 0 ? (sumWin / winCount) : 0;
+            const avgLoss = lossCount > 0 ? (sumLoss / lossCount) : 0;
+            const pf = sumLoss > 0 ? (sumWin / sumLoss).toFixed(2) : (sumWin > 0 ? '∞' : '0,00');
+
+            let bestTrade = 0;
+            let worstTrade = 0;
+            if (closedTrades.length > 0) {
+                bestTrade = Math.max(...closedTrades.map(t => t.pnl));
+                worstTrade = Math.min(...closedTrades.map(t => t.pnl));
+            }
+
+            let maxWins = 0, currentWins = 0;
+            let maxLosses = 0, currentLosses = 0;
+
+            [...closedTrades].reverse().forEach(t => {
+                if (t.pnl > 0) {
+                    currentWins++;
+                    currentLosses = 0;
+                    if (currentWins > maxWins) maxWins = currentWins;
+                } else if (t.pnl < 0) {
+                    currentLosses++;
+                    currentWins = 0;
+                    if (currentLosses > maxLosses) maxLosses = currentLosses;
+                }
+            });
+
+            const totalPnlEl = document.getElementById('stat-total-pnl');
+            totalPnlEl.textContent = (totalPnl >= 0 ? '+' : '') + totalPnl.toFixed(2) + '$';
+            totalPnlEl.className = `text-3xl font-extrabold ${totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}`;
+
+            document.getElementById('stat-total-count').textContent = `${totalCount} trade'ów`;
+            document.getElementById('stat-winrate').textContent = `${winRate}%`;
+            document.getElementById('stat-winrate-sub').textContent = `${winCount}W / ${lossCount}L`;
+            document.getElementById('stat-pf').textContent = pf;
+            document.getElementById('stat-avg-win').textContent = '+' + avgWin.toFixed(2) + '$';
+            document.getElementById('stat-avg-loss').textContent = '-' + avgLoss.toFixed(2) + '$';
+            document.getElementById('stat-best-trade').textContent = '+' + bestTrade.toFixed(2) + '$';
+            document.getElementById('stat-worst-trade').textContent = worstTrade.toFixed(2) + '$';
+            document.getElementById('stat-max-wins').textContent = maxWins;
+            document.getElementById('stat-max-losses').textContent = maxLosses;
+        }
+
         setInterval(fetchEconomicCalendar, 1800000);
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchEconomicCalendar();
+            renderJournal();
         });
     </script>
 </body>
