@@ -62,10 +62,10 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden bg-grid">
 
-    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI -->
-    <header class="h-10 bg-[#090d14] border-b border-gray-800/60 flex items-center overflow-hidden shrink-0 z-20 select-none">
-        <div class="tradingview-widget-container w-full">
-            <div class="tradingview-widget-container__widget"></div>
+    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI (OPTYMALIZOWANY DLA MOBILE) -->
+    <header class="h-8 md:h-10 bg-[#090d14] border-b border-gray-800/60 flex items-center overflow-hidden shrink-0 z-20 select-none">
+        <div class="tradingview-widget-container w-full h-full flex items-center">
+            <div class="tradingview-widget-container__widget w-full"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
             {
             "symbols": [
@@ -75,7 +75,7 @@
                 { "proName": "FOREXCOM:GER40", "title": "GER40" },
                 { "proName": "FOREXCOM:US30", "title": "US30" }
             ],
-            "showSymbolLogo": true,
+            "showSymbolLogo": false,
             "isTransparent": true,
             "displayMode": "adaptive",
             "colorTheme": "dark",
@@ -86,15 +86,15 @@
     </header>
 
     <!-- MOBILNY PRZYCISK HAMBURGERA -->
-    <div class="lg:hidden bg-[#080c14] border-b border-gray-800/60 p-3 flex items-center justify-between z-30">
+    <div class="lg:hidden bg-[#080c14] border-b border-gray-800/60 p-2.5 flex items-center justify-between z-30">
         <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-full border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold text-xs">
+            <div class="w-6 h-6 rounded-full border border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold text-[10px]">
                 ZPP
             </div>
             <span class="text-white font-bold text-xs tracking-wider">TERMINAL ZPP</span>
         </div>
         <button onclick="toggleMobileSidebar()" class="text-gray-300 hover:text-white focus:outline-none p-1">
-            <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
+            <i class="fa-solid fa-bars text-lg" id="menu-icon"></i>
         </button>
     </div>
 
@@ -149,10 +149,6 @@
                         <i class="fa-solid fa-link w-4 text-center"></i>
                         <span>Dane On-Chain</span>
                     </button>
-                    <button onclick="switchTab('watchlist')" id="btn-watchlist" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
-                        <i class="fa-regular fa-star w-4 text-center text-amber-400"></i>
-                        <span>Watchlista</span>
-                    </button>
                     <button onclick="switchTab('ruchy')" id="btn-ruchy" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
                         <i class="fa-solid fa-fish-fins w-4 text-center text-sky-400"></i>
                         <span>Ruchy wielorybów</span>
@@ -170,10 +166,6 @@
                         <i class="fa-solid fa-calculator w-4 text-center text-orange-400"></i>
                         <span>Kalkulator pozycji</span>
                     </button>
-                    <button onclick="switchTab('kalkulatory-inwestycyjne')" id="btn-kalkulatory-inwestycyjne" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
-                        <i class="fa-solid fa-chart-pie w-4 text-center text-blue-400"></i>
-                        <span>Kalkulatory inwestycyjne</span>
-                    </button>
                     <button onclick="switchTab('dziennik')" id="btn-dziennik" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
                         <i class="fa-solid fa-book-bookmark w-4 text-center text-purple-400"></i>
                         <span>Dziennik tradingu</span>
@@ -181,14 +173,6 @@
                     <button onclick="switchTab('checklista')" id="btn-checklista" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
                         <i class="fa-regular fa-square-check w-4 text-center text-pink-400"></i>
                         <span>Checklista tradera</span>
-                    </button>
-                    <button onclick="switchTab('korelacje')" id="btn-korelacje" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
-                        <i class="fa-solid fa-diagram-project w-4 text-center"></i>
-                        <span>Mapa korelacji</span>
-                    </button>
-                    <button onclick="switchTab('tracker')" id="btn-tracker" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
-                        <i class="fa-solid fa-wallet w-4 text-center"></i>
-                        <span>Tracker portfela</span>
                     </button>
                 </nav>
             </div>
@@ -333,14 +317,10 @@
             <section id="tab-prasowki" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Prasówki rynkowe</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-predykcje" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Predykcje rynku</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-onchain" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Dane On-Chain</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
-            <section id="tab-watchlist" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Watchlista</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-ruchy" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Ruchy wielorybów</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-likwidacje" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Likwidacje</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-kalkulator-pozycji" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Kalkulator pozycji</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
-            <section id="tab-kalkulatory-inwestycyjne" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Kalkulatory inwestycyjne</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
             <section id="tab-checklista" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Checklista tradera</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
-            <section id="tab-korelacje" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Mapa korelacji</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
-            <section id="tab-tracker" class="tab-content"><h2 class="text-2xl font-bold text-white mb-2">Tracker portfela</h2><div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">[ Treść ]</div></section>
 
         </main>
     </div>
@@ -381,8 +361,9 @@
                         <input type="number" step="0.01" min="0.01" value="0.01" id="trade-size" required class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-cyan-500">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-1">Dźwignia MT5</label>
-                        <input type="number" value="500" id="trade-leverage" readonly class="w-full bg-[#06090e]/50 border border-gray-800/50 rounded-lg p-2.5 text-gray-400 font-mono cursor-not-allowed">
+                        <!-- ZMIENIONE: DŹWIGNIA JEST TERAZ W PEŁNI EDYTOWALNA -->
+                        <label class="block text-gray-400 mb-1">Dźwignia (np. 1:500, 1:50)</label>
+                        <input type="text" id="trade-leverage" value="1:500" placeholder="1:500" required class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-cyan-500">
                     </div>
                 </div>
                 <div>
@@ -520,52 +501,60 @@
                 });
 
             } catch (err) {
-                console.warn('Użycie wewnętrznego zapasowego API:', err);
-                calendarData = generateSortedWeekData(monday);
+                console.warn('Użycie stałego harmonogramu tygodniowego:', err);
+                calendarData = generateStableWeekData(monday);
             }
 
             calendarData.sort((a, b) => a.timestamp - b.timestamp);
             renderCalendar();
         }
 
-        function generateSortedWeekData(mondayDate) {
+        // EDYCJA KALENDARZA: DETERMINISTYCZNY GENERATOR (NIE ZMIENIA SIĘ PO ODŚWIEŻENIU STRONY W TYM SAMYM TYGODNIU)
+        function generateStableWeekData(mondayDate) {
             const events = [];
-            const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'NZD', 'CHF', 'CNY'];
-            const sampleEvents = [
-                { title: 'Wskaźnik cen towarów i usług konsumpcyjnych (CPI) m/m', impact: 'high' },
-                { title: 'Wskaźnik PMI dla przemysłu', impact: 'medium' },
-                { title: 'Decyzja w sprawie stóp procentowych', impact: 'high' },
-                { title: 'Wystąpienie szefa Banku Centralnego', impact: 'high' },
-                { title: 'Bilans handlowy', impact: 'low' },
-                { title: 'Sprzedaż detaliczna m/m', impact: 'medium' },
-                { title: 'Zasiłki dla bezrobotnych', impact: 'medium' }
+            const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
+            const presetEvents = [
+                { title: 'Wskaźnik CPI m/m', impact: 'high', hour: 14, min: 30 },
+                { title: 'Decyzja w sprawie stóp procentowych', impact: 'high', hour: 15, min: 0 },
+                { title: 'Wskaźnik PMI dla przemysłu', impact: 'medium', hour: 10, min: 0 },
+                { title: 'Zasiłki dla bezrobotnych', impact: 'medium', hour: 14, min: 30 },
+                { title: 'Sprzedaż detaliczna m/m', impact: 'medium', hour: 12, min: 0 },
+                { title: 'Wystąpienie Szefa Banku Centralnego', impact: 'high', hour: 18, min: 0 }
             ];
 
-            for (let i = 0; i < 7; i++) {
+            // Stały algorytm generatora bazujący na dacie poniedziałku (zmienia dane dopiero po zmianie tygodnia)
+            const seedBase = mondayDate.valueOf();
+
+            for (let dayOffset = 0; dayOffset < 5; dayOffset++) { // Pon-Pt
                 const currentDate = new Date(mondayDate);
-                currentDate.setDate(mondayDate.getDate() + i);
+                currentDate.setDate(mondayDate.getDate() + dayOffset);
                 const dateStr = formatDate(currentDate);
 
-                const count = Math.floor(Math.random() * 5) + 3;
-                for (let j = 0; j < count; j++) {
-                    const ev = sampleEvents[Math.floor(Math.random() * sampleEvents.length)];
-                    const curr = currencies[Math.floor(Math.random() * currencies.length)];
-                    
-                    const hour = Math.floor(Math.random() * 15) + 7;
-                    const min = Math.random() > 0.5 ? 30 : 0;
+                // Stała ilość zdarzeń dla każdego dnia tygodnia
+                const dayEventCount = 3 + ((dayOffset * 3) % 3);
+
+                for (let j = 0; j < dayEventCount; j++) {
+                    const presetIdx = (dayOffset + j) % presetEvents.length;
+                    const ev = presetEvents[presetIdx];
+                    const curr = currencies[(dayOffset * 2 + j) % currencies.length];
                     
                     const timeDate = new Date(currentDate);
-                    timeDate.setHours(hour, min, 0, 0);
+                    timeDate.setHours(ev.hour, ev.min, 0, 0);
+
+                    // Deterministyczna kalkulacja prognozy i wartości poprzedniej
+                    const valCalc = ((seedBase / 100000) + dayOffset + j * 7) % 5 - 2;
+                    const forecastVal = valCalc.toFixed(1) + '%';
+                    const prevVal = (valCalc - 0.2).toFixed(1) + '%';
 
                     events.push({
                         timestamp: timeDate.getTime(),
                         date: dateStr,
-                        time: `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`,
+                        time: `${String(ev.hour).padStart(2, '0')}:${String(ev.min).padStart(2, '0')}`,
                         currency: curr,
                         event: ev.title,
                         impact: ev.impact,
-                        forecast: (Math.random() * 4 - 1).toFixed(1) + '%',
-                        previous: (Math.random() * 4 - 1).toFixed(1) + '%'
+                        forecast: forecastVal,
+                        previous: prevVal
                     });
                 }
             }
@@ -748,6 +737,7 @@
             const sl = parseFloat(document.getElementById('trade-sl').value) || null;
             const tp = parseFloat(document.getElementById('trade-tp').value) || null;
             const size = parseFloat(document.getElementById('trade-size').value);
+            const leverage = document.getElementById('trade-leverage').value.trim() || '1:500';
             const notes = document.getElementById('trade-notes').value;
 
             const newTrade = {
@@ -759,7 +749,7 @@
                 sl,
                 tp,
                 size,
-                leverage: 500,
+                leverage,
                 notes,
                 status: 'OPEN',
                 closePrice: null,
@@ -857,7 +847,7 @@
                             <td class="py-3 px-4 font-mono text-gray-200">$${t.entry.toFixed(2)}</td>
                             <td class="py-3 px-4 font-mono text-rose-400">${t.sl ? '$' + t.sl.toFixed(2) : '-'}</td>
                             <td class="py-3 px-4 font-mono text-emerald-400">${t.tp ? '$' + t.tp.toFixed(2) : '-'}</td>
-                            <td class="py-3 px-4 font-mono text-gray-300">${t.size.toFixed(4)}</td>
+                            <td class="py-3 px-4 font-mono text-gray-300">${t.size.toFixed(4)} <span class="text-[10px] text-gray-500">(${t.leverage || '1:500'})</span></td>
                             <td class="py-3 px-4 text-right">
                                 <div class="flex items-center justify-end gap-3">
                                     <button onclick="openCloseModal(${t.id})" class="text-amber-400 hover:text-amber-300 font-medium">Zamknij</button>
@@ -902,7 +892,7 @@
                             <td class="py-3 px-4"><span class="px-2 py-0.5 rounded font-bold ${t.direction === 'LONG' ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50' : 'bg-rose-950/80 text-rose-400 border border-rose-800/50'}">${t.direction}</span></td>
                             <td class="py-3 px-4 font-mono text-gray-200">$${t.entry.toFixed(2)}</td>
                             <td class="py-3 px-4 font-mono text-gray-200">$${t.closePrice.toFixed(2)}</td>
-                            <td class="py-3 px-4 font-mono text-gray-300">${t.size.toFixed(4)}</td>
+                            <td class="py-3 px-4 font-mono text-gray-300">${t.size.toFixed(4)} <span class="text-[10px] text-gray-500">(${t.leverage || '1:500'})</span></td>
                             <td class="py-3 px-4 font-mono font-bold ${t.pnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}">${pnlFormatted}</td>
                             <td class="py-3 px-4 text-right">
                                 <button onclick="deleteTrade(${t.id})" class="text-rose-500 hover:text-rose-400">Usuń</button>
