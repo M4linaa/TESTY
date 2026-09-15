@@ -56,54 +56,45 @@
             background: #1f2937;
             border-radius: 3px;
         }
-
-        /* ANIMACJA PŁYNNEGO PRZEWIJANIA PASKA (TICKER) */
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        .ticker-wrapper {
-            display: flex;
-            width: max-content;
-            animation: ticker 30s linear infinite;
-        }
-
-        .ticker-wrapper:hover {
-            animation-play-state: paused; /* Zatrzymuje ruch po najechaniu myszką */
-        }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden bg-grid">
 
-    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI (PRZEWIJANY PASKIEM/TICKER) -->
+    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI (TRADINGVIEW TICKER TAPE) -->
     <header class="h-10 bg-[#090d14] border-b border-gray-800/60 flex items-center overflow-hidden shrink-0 z-20 select-none">
-        <div class="ticker-wrapper flex items-center text-xs whitespace-nowrap">
-            
-            <!-- PIERWSZA SERIA DANYCH -->
-            <div class="flex items-center gap-6 px-3">
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">US100</span><span class="text-white">$29,236.3</span><span class="text-emerald-500 font-medium">+0.29%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">US500</span><span class="text-white">$7,653.5</span><span class="text-emerald-500 font-medium">+0.37%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">BTC</span><span class="text-white">$76,008.00</span><span class="text-rose-500 font-medium">-3.97%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">ETH</span><span class="text-white">$2,404.58</span><span class="text-rose-500 font-medium">-5.51%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">SOL</span><span class="text-white">$97.96</span><span class="text-rose-500 font-medium">-5.28%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">BNB</span><span class="text-white">$720.14</span><span class="text-rose-500 font-medium">-0.82%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">XRP</span><span class="text-white">$1.30</span><span class="text-rose-500 font-medium">-11.18%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">GOLD</span><span class="text-white">$4,277.1</span><span class="text-rose-500 font-medium">-1.14%</span></div>
-            </div>
-
-            <!-- DUPLIKAT DLA PŁYNNEGO ZAPĘTLENIA (BEZ PRZERWY) -->
-            <div class="flex items-center gap-6 px-3">
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">US100</span><span class="text-white">$29,236.3</span><span class="text-emerald-500 font-medium">+0.29%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">US500</span><span class="text-white">$7,653.5</span><span class="text-emerald-500 font-medium">+0.37%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">BTC</span><span class="text-white">$76,008.00</span><span class="text-rose-500 font-medium">-3.97%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">ETH</span><span class="text-white">$2,404.58</span><span class="text-rose-500 font-medium">-5.51%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">SOL</span><span class="text-white">$97.96</span><span class="text-rose-500 font-medium">-5.28%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">BNB</span><span class="text-white">$720.14</span><span class="text-rose-500 font-medium">-0.82%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">XRP</span><span class="text-white">$1.30</span><span class="text-rose-500 font-medium">-11.18%</span></div>
-                <div class="flex items-center gap-2"><span class="text-gray-400 font-semibold">GOLD</span><span class="text-white">$4,277.1</span><span class="text-rose-500 font-medium">-1.14%</span></div>
-            </div>
-
+        <div class="tradingview-widget-container w-full">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+            "symbols": [
+                {
+                "proName": "BINANCE:BTCUSDT",
+                "title": "BTC"
+                },
+                {
+                "proName": "BINANCE:ETHUSDT",
+                "title": "ETH"
+                },
+                {
+                "proName": "OANDA:XAUUSD",
+                "title": "ZŁOTO"
+                },
+                {
+                "proName": "FOREXCOM:DJI",
+                "title": "US30"
+                },
+                {
+                "proName": "FOREXCOM:NSXUSD",
+                "title": "NAS100"
+                }
+            ],
+            "showSymbolLogo": true,
+            "isTransparent": true,
+            "displayMode": "adaptive",
+            "colorTheme": "dark",
+            "locale": "pl"
+            }
+            </script>
         </div>
     </header>
 
