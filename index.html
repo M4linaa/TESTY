@@ -3,62 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Predykcje</title>
+    <title>TERMINAL ZPP</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome (Ikony) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #050b14; color: white; font-family: 'Inter', sans-serif; }
-        .card { background-color: #0b111a; border: 1px solid #1f2937; }
+        body {
+            background-color: #06090e;
+            color: #9ca3af;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Style dla siatki w tle (grid overlay) */
+        .bg-grid {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+
+        /* Aktywna zakładka */
+        .nav-link.active {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .nav-link:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #e5e7eb;
+        }
+
+        /* Ukrywanie nieaktywnych sekcji */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Customowy pasek przewijania */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #06090e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 3px;
+        }
     </style>
 </head>
-<body class="p-8">
+<body class="h-screen flex flex-col overflow-hidden bg-grid">
 
-    <!-- Kontener na kafelek -->
-    <div class="card max-w-md p-5 rounded-xl shadow-lg">
+    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI (TICKER) -->
+    <header class="h-10 bg-[#090d14] border-b border-gray-800/60 flex items-center px-4 text-xs overflow-x-auto whitespace-nowrap gap-6 shrink-0 z-20">
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">US100</span>
+            <span class="text-white">$29,250.3</span>
+            <span class="text-emerald-500 font-medium">+0.34%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">US500</span>
+            <span class="text-white">$7,656.0</span>
+            <span class="text-emerald-500 font-medium">+0.41%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">BTC</span>
+            <span class="text-white">$75,995.00</span>
+            <span class="text-rose-500 font-medium">-3.86%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">ETH</span>
+            <span class="text-white">$2,404.43</span>
+            <span class="text-rose-500 font-medium">-5.19%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">SOL</span>
+            <span class="text-white">$98.19</span>
+            <span class="text-rose-500 font-medium">-4.95%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">BNB</span>
+            <span class="text-white">$719.99</span>
+            <span class="text-rose-500 font-medium">-0.80%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">XRP</span>
+            <span class="text-white">$1.32</span>
+            <span class="text-rose-500 font-medium">-9.63%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">GOLD</span>
+            <span class="text-white">$4,281.2</span>
+            <span class="text-rose-500 font-medium">-1.05%</span>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
         
-        <!-- Nagłówek kafelka -->
-        <div class="flex justify-between items-center mb-4">
-            <div class="text-xl font-bold">
-                BTC <span class="text-gray-400 text-sm font-normal">$75 189</span>
+        <!-- 2. BOCOWE MENU (SIDEBAR) -->
+        <aside class="w-64 bg-[#080c14]/90 border-r border-gray-800/60 flex flex-col justify-between overflow-y-auto shrink-0 p-4 select-none">
+            <div>
+                <!-- LOGO -->
+                <div class="mb-6 flex flex-col items-center border-b border-gray-800/60 pb-4">
+                    <div class="w-10 h-10 rounded-full border-2 border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold mb-2 shadow-lg shadow-cyan-500/10">
+                        ZPP
+                    </div>
+                    <h1 class="text-white font-bold text-sm tracking-wider">TERMINAL ZPP</h1>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] text-gray-400 font-medium">Dane na żywo</span>
+                    </div>
+                </div>
+
+                <!-- SEKCJA: PANEL -->
+                <div class="text-[11px] font-semibold tracking-wider text-gray-500 uppercase px-3 mb-2">Panel</div>
+                <nav class="space-y-1 mb-6">
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-chart-line w-4 text-center"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('kalendarz')" id="btn-kalendarz" class="nav-link active w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-regular fa-calendar-days w-4 text-center"></i>
+                        <span>Kalendarz Ekonomiczny</span>
+                    </button>
+                    <button onclick="switchTab('zagrania')" id="btn-zagrania" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-bullseye w-4 text-center text-rose-400"></i>
+                        <span>Zagrania Marka</span>
+                    </button>
+                    <button onclick="switchTab('skaner')" id="btn-skaner" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-brain w-4 text-center text-pink-400"></i>
+                        <span>Skaner Smart Money</span>
+                    </button>
+                    <button onclick="switchTab('prasowki')" id="btn-prasowki" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-regular fa-newspaper w-4 text-center"></i>
+                        <span>Prasówki rynkowe</span>
+                    </button>
+                    <button onclick="switchTab('predykcje')" id="btn-predykcje" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-flask w-4 text-center text-teal-400"></i>
+                        <span>Predykcje rynku</span>
+                    </button>
+                    <button onclick="switchTab('onchain')" id="btn-onchain" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-link w-4 text-center"></i>
+                        <span>Dane On-Chain</span>
+                    </button>
+                    <button onclick="switchTab('watchlist')" id="btn-watchlist" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-regular fa-star w-4 text-center text-amber-400"></i>
+                        <span>Watchlista</span>
+                    </button>
+                    <button onclick="switchTab('ruchy')" id="btn-ruchy" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-fish-fins w-4 text-center text-sky-400"></i>
+                        <span>Ruchy wielorybów</span>
+                    </button>
+                    <button onclick="switchTab('likwidacje')" id="btn-likwidacje" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-fire w-4 text-center text-orange-500"></i>
+                        <span>Likwidacje</span>
+                    </button>
+                </nav>
+
+                <!-- SEKCJA: NARZĘDZIA -->
+                <div class="text-[11px] font-semibold tracking-wider text-gray-500 uppercase px-3 mb-2">Narzędzia</div>
+                <nav class="space-y-1">
+                    <button onclick="switchTab('kalkulator-pozycji')" id="btn-kalkulator-pozycji" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-calculator w-4 text-center text-orange-400"></i>
+                        <span>Kalkulator pozycji</span>
+                    </button>
+                    <button onclick="switchTab('kalkulatory-inwestycyjne')" id="btn-kalkulatory-inwestycyjne" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-chart-pie w-4 text-center text-blue-400"></i>
+                        <span>Kalkulatory inwestycyjne</span>
+                    </button>
+                    <button onclick="switchTab('dziennik')" id="btn-dziennik" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-regular fa-book w-4 text-center text-purple-400"></i>
+                        <span>Dziennik tradingu</span>
+                    </button>
+                    <button onclick="switchTab('checklista')" id="btn-checklista" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-regular fa-square-check w-4 text-center text-pink-400"></i>
+                        <span>Checklista tradera</span>
+                    </button>
+                    <button onclick="switchTab('korelacje')" id="btn-korelacje" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-diagram-project w-4 text-center"></i>
+                        <span>Mapa korelacji</span>
+                    </button>
+                    <button onclick="switchTab('tracker')" id="btn-tracker" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
+                        <i class="fa-solid fa-wallet w-4 text-center"></i>
+                        <span>Tracker portfela</span>
+                    </button>
+                </nav>
             </div>
-            <div class="px-3 py-1 text-xs border border-red-900 text-red-500 rounded-md">
-                Niezdecydowani
-            </div>
-        </div>
+        </aside>
 
-        <!-- Opis czasu -->
-        <p class="text-gray-500 text-xs mb-4">
-            Przewidywanie z <span class="text-gray-300">wczoraj, 15.09 18:35</span> na dziś, <span class="text-gray-300">16.09 18:35</span>
-        </p>
+        <!-- 3. GŁÓWNY OBSZAR ROBOCZY (TREŚĆ ZAKŁADEK) -->
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            
+            <!-- 1. Dashboard -->
+            <section id="tab-dashboard" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Dashboard</h2>
+                <p class="text-sm text-gray-500 mb-6">Główny pulpit nawigacyjny.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Dashboard ]
+                </div>
+            </section>
 
-        <!-- Procenty -->
-        <div class="flex justify-between text-sm mb-1">
-            <span class="text-gray-400">Gracze stawiali na wzrost</span>
-            <span class="text-gray-400">na spadek</span>
-        </div>
-        <div class="flex justify-between items-end mb-2">
-            <span class="text-red-500 text-3xl font-bold">47%</span>
-            <span class="text-white text-2xl font-bold">53%</span>
-        </div>
+            <!-- 2. Kalendarz Ekonomiczny -->
+            <section id="tab-kalendarz" class="tab-content active">
+                <h2 class="text-2xl font-bold text-white mb-1">Kalendarz ekonomiczny</h2>
+                <p class="text-sm text-gray-500 mb-6">Kluczowe wydarzenia makro na ten tydzień</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Kalendarz Ekonomiczny ]
+                </div>
+            </section>
 
-        <!-- Pasek postępu (Progress bar) -->
-        <div class="w-full h-3 bg-red-500 rounded-full flex overflow-hidden mb-4">
-            <div class="h-full bg-[#10b981]" style="width: 47%;"></div>
-            <div class="h-full bg-red-500" style="width: 53%;"></div>
-        </div>
+            <!-- 3. Zagrania Marka -->
+            <section id="tab-zagrania" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Zagrania Marka</h2>
+                <p class="text-sm text-gray-500 mb-6">Sygnały i pozycje tradera.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Zagrania Marka ]
+                </div>
+            </section>
 
-        <!-- Informacje dolne -->
-        <div class="text-xs text-gray-500 flex items-center mb-4">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Wynik poznamy 16.09 o 18:00 czasu PL (za ok. 21 godz.)
-        </div>
+            <!-- 4. Skaner Smart Money -->
+            <section id="tab-skaner" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Skaner Smart Money</h2>
+                <p class="text-sm text-gray-500 mb-6">Analiza przepływów dużego kapitału.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Skaner Smart Money ]
+                </div>
+            </section>
 
-        <div class="bg-gray-900 p-3 rounded-md text-xs text-gray-400 border border-gray-800 flex justify-between">
-            <span>Kurs na żywo w trakcie okna: <span class="text-red-500">28% na wzrost</span></span>
-            <span>ⓘ</span>
-        </div>
+            <!-- 5. Prasówki rynkowe -->
+            <section id="tab-prasowki" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Prasówki rynkowe</h2>
+                <p class="text-sm text-gray-500 mb-6">Najważniejsze wiadomości rynkowe.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Prasówki rynkowe ]
+                </div>
+            </section>
 
-        <p class="text-gray-600 text-[10px] mt-4">Źródło: Polymarket</p>
+            <!-- 6. Predykcje rynku -->
+            <section id="tab-predykcje" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Predykcje rynku</h2>
+                <p class="text-sm text-gray-500 mb-6">Co przewiduje rynek na najbliższy czas.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Predykcje rynku ]
+                </div>
+            </section>
+
+            <!-- 7. Dane On-Chain -->
+            <section id="tab-onchain" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Dane On-Chain</h2>
+                <p class="text-sm text-gray-500 mb-6">Wskaźniki i statystyki z sieci blockchain.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Dane On-Chain ]
+                </div>
+            </section>
+
+            <!-- 8. Watchlista -->
+            <section id="tab-watchlist" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Watchlista</h2>
+                <p class="text-sm text-gray-500 mb-6">Lista obserwowanych aktywów.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Watchlista ]
+                </div>
+            </section>
+
+            <!-- 9. Ruchy wielorybów -->
+            <section id="tab-ruchy" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Ruchy wielorybów</h2>
+                <p class="text-sm text-gray-500 mb-6">Monitoring dużych transakcji.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Ruchy wielorybów ]
+                </div>
+            </section>
+
+            <!-- 10. Likwidacje -->
+            <section id="tab-likwidacje" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Likwidacje</h2>
+                <p class="text-sm text-gray-500 mb-6">Mapa i statystyki likwidacji pozycji.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Likwidacje ]
+                </div>
+            </section>
+
+            <!-- 11. Kalkulator pozycji -->
+            <section id="tab-kalkulator-pozycji" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Kalkulator pozycji</h2>
+                <p class="text-sm text-gray-500 mb-6">Oblicz wielkość wielkość wielkości pozycji i ryzyko.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Kalkulator pozycji ]
+                </div>
+            </section>
+
+            <!-- 12. Kalkulatory inwestycyjne -->
+            <section id="tab-kalkulatory-inwestycyjne" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Kalkulatory inwestycyjne</h2>
+                <p class="text-sm text-gray-500 mb-6">Złożone obliczenia inwestycyjne.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Kalkulatory inwestycyjne ]
+                </div>
+            </section>
+
+            <!-- 13. Dziennik tradingu -->
+            <section id="tab-dziennik" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Dziennik tradingu</h2>
+                <p class="text-sm text-gray-500 mb-6">Zapisuj i analizuj swoje transakcje.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Dziennik tradingu ]
+                </div>
+            </section>
+
+            <!-- 14. Checklista tradera -->
+            <section id="tab-checklista" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Checklista tradera</h2>
+                <p class="text-sm text-gray-500 mb-6">Zasady przed otwarciem pozycji.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Checklista tradera ]
+                </div>
+            </section>
+
+            <!-- 15. Mapa korelacji -->
+            <section id="tab-korelacje" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Mapa korelacji</h2>
+                <p class="text-sm text-gray-500 mb-6">Zależności cenowe między rynkami.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Mapa korelacji ]
+                </div>
+            </section>
+
+            <!-- 16. Tracker portfela -->
+            <section id="tab-tracker" class="tab-content">
+                <h2 class="text-2xl font-bold text-white mb-2">Tracker portfela</h2>
+                <p class="text-sm text-gray-500 mb-6">Podsumowanie i wartość Twojego portfela.</p>
+                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
+                    [ Tutaj wkleimy treść dla: Tracker portfela ]
+                </div>
+            </section>
+
+        </main>
     </div>
 
+    <!-- SKRYPT DO OBSŁUGI KLIKANIA W ZAKŁADKI -->
+    <script>
+        function switchTab(tabId) {
+            // Ukryj wszystkie sekcje treści
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Odznacz wszystkie przyciski w menu
+            const buttons = document.querySelectorAll('.nav-link');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Pokaż wybraną sekcję
+            const activeContent = document.getElementById('tab-' + tabId);
+            if (activeContent) {
+                activeContent.classList.add('active');
+            }
+
+            // Podświetl wybrany przycisk w menu
+            const activeButton = document.getElementById('btn-' + tabId);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
