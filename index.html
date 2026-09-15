@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome (Ikony) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         body {
@@ -62,7 +64,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden bg-grid">
 
-    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI (OPTYMALIZOWANY DLA MOBILE) -->
+    <!-- 1. GÓRNY PASEK Z NOTOWANIAMI -->
     <header class="h-8 md:h-10 bg-[#090d14] border-b border-gray-800/60 flex items-center overflow-hidden shrink-0 z-20 select-none">
         <div class="tradingview-widget-container w-full h-full flex items-center">
             <div class="tradingview-widget-container__widget w-full"></div>
@@ -100,13 +102,11 @@
 
     <div class="flex flex-1 overflow-hidden relative">
         
-        <!-- BACKDROP DLA MOBILNEGO MENU -->
         <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden transition-opacity"></div>
 
         <!-- 2. BOCZNE MENU (SIDEBAR) -->
         <aside id="sidebar" class="fixed lg:relative top-0 left-0 h-full w-64 bg-[#080c14] lg:bg-[#080c14]/90 border-r border-gray-800/60 flex flex-col justify-between overflow-y-auto shrink-0 p-4 select-none z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
             <div>
-                <!-- LOGO (Dla desktop) -->
                 <div class="hidden lg:flex mb-6 flex-col items-center border-b border-gray-800/60 pb-4">
                     <div class="w-10 h-10 rounded-full border-2 border-cyan-500/50 flex items-center justify-center text-cyan-400 font-bold mb-2 shadow-lg shadow-cyan-500/10">
                         ZPP
@@ -118,7 +118,6 @@
                     </div>
                 </div>
 
-                <!-- SEKCJA: PANEL -->
                 <div class="text-[11px] font-semibold tracking-wider text-gray-500 uppercase px-3 mb-2">Panel</div>
                 <nav class="space-y-1 mb-6">
                     <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
@@ -159,7 +158,6 @@
                     </button>
                 </nav>
 
-                <!-- SEKCJA: NARZĘDZIA -->
                 <div class="text-[11px] font-semibold tracking-wider text-gray-500 uppercase px-3 mb-2">Narzędzia</div>
                 <nav class="space-y-1">
                     <button onclick="switchTab('kalkulator-pozycji')" id="btn-kalkulator-pozycji" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-150">
@@ -230,8 +228,35 @@
                 </div>
             </section>
 
-            <!-- Sekcja Dziennika Tradingu MT5 -->
+            <!-- Sekcja Dziennika Tradingu MT5 Z PANELAMI AUTH / ADMINA -->
             <section id="tab-dziennik" class="tab-content">
+                <!-- SEKCJA LOGOWANIA KODEM -->
+                <div class="bg-[#0d131f] border border-gray-800/80 rounded-xl p-4 mb-6">
+                    <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-key text-cyan-400"></i> Dostęp i Synchronizacja Chmury
+                    </h3>
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <input type="text" id="user-sync-code" placeholder="Wpisz 32-znakowy kod dostępu..." class="w-full bg-[#06090e] border border-gray-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
+                        <button onclick="loginWithCode()" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all whitespace-nowrap">
+                            Zaloguj i synchronizuj
+                        </button>
+                    </div>
+                    <p id="auth-status" class="text-[11px] mt-2 font-medium"></p>
+                </div>
+
+                <!-- SEKCJA UKRYTEGO PANELU ADMINA (POJAWIA SIĘ TYLKO DLA ADMINA) -->
+                <div id="admin-panel" class="hidden bg-rose-950/30 border border-rose-800/50 rounded-xl p-4 mb-6">
+                    <h3 class="text-sm font-bold text-rose-400 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield"></i> Panel Administratora (Generowanie Kluczy)
+                    </h3>
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <button onclick="generateNewUserCode()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all whitespace-nowrap">
+                            Wygeneruj nowy kod dostępu (32 znaki)
+                        </button>
+                        <input type="text" id="new-generated-code" readonly placeholder="Kliknij przycisk obok..." class="w-full bg-[#06090e] border border-gray-800 rounded-lg px-3 py-2 text-xs text-emerald-400 font-mono focus:outline-none">
+                    </div>
+                </div>
+
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 class="text-2xl font-bold text-white mb-1">Dziennik tradingu</h2>
@@ -361,7 +386,6 @@
                         <input type="number" step="0.01" min="0.01" value="0.01" id="trade-size" required class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-cyan-500">
                     </div>
                     <div>
-                        <!-- ZMIENIONE: DŹWIGNIA JEST TERAZ W PEŁNI EDYTOWALNA -->
                         <label class="block text-gray-400 mb-1">Dźwignia (np. 1:500, 1:50)</label>
                         <input type="text" id="trade-leverage" value="1:500" placeholder="1:500" required class="w-full bg-[#06090e] border border-gray-800 rounded-lg p-2.5 text-white font-mono focus:outline-none focus:border-cyan-500">
                     </div>
@@ -403,6 +427,53 @@
 
     <!-- SKRYPTY APLIKACJI -->
     <script>
+        // --- KONFIGURACJA SUPABASE & AUTH ---
+        const SUPABASE_URL = 'TWOJ_SUPABASE_URL';
+        const SUPABASE_KEY = 'TWOJ_SUPABASE_ANON_KEY';
+        let db = null;
+        if (typeof supabase !== 'undefined' && SUPABASE_URL !== 'TWOJ_SUPABASE_URL') {
+            db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        // Twój unikalny 32-znakowy kod administratora
+        const MASTER_ADMIN_CODE = "ADM84K29PX71L903NVQ56R82WM40ZT1Y";
+        let currentActiveCode = "";
+
+        async function loginWithCode() {
+            const inputCode = document.getElementById('user-sync-code').value.trim();
+            const status = document.getElementById('auth-status');
+
+            if (inputCode.length !== 32) {
+                status.innerText = "Nieprawidłowy kod (musi mieć dokładnie 32 znaki).";
+                status.className = "text-[11px] mt-2 font-medium text-rose-500";
+                return;
+            }
+
+            currentActiveCode = inputCode;
+            localStorage.setItem('zpp_saved_sync_code', inputCode);
+
+            if (inputCode === MASTER_ADMIN_CODE) {
+                document.getElementById('admin-panel').classList.remove('hidden');
+                status.innerText = "Zalogowano jako ADMINISTRATOR. Panel wygenerowany.";
+                status.className = "text-[11px] mt-2 font-medium text-emerald-400";
+            } else {
+                document.getElementById('admin-panel').classList.add('hidden');
+                status.innerText = "Dostęp przyznany. Zsynchronizowano z chmurą.";
+                status.className = "text-[11px] mt-2 font-medium text-emerald-400";
+            }
+
+            loadTradesFromCloud();
+        }
+
+        function generateNewUserCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 32; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('new-generated-code').value = result;
+        }
+
         // --- 1. OBSŁUGA INTERFEJSU I NAWIGACJI ---
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -509,7 +580,6 @@
             renderCalendar();
         }
 
-        // EDYCJA KALENDARZA: DETERMINISTYCZNY GENERATOR (NIE ZMIENIA SIĘ PO ODŚWIEŻENIU STRONY W TYM SAMYM TYGODNIU)
         function generateStableWeekData(mondayDate) {
             const events = [];
             const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
@@ -522,15 +592,13 @@
                 { title: 'Wystąpienie Szefa Banku Centralnego', impact: 'high', hour: 18, min: 0 }
             ];
 
-            // Stały algorytm generatora bazujący na dacie poniedziałku (zmienia dane dopiero po zmianie tygodnia)
             const seedBase = mondayDate.valueOf();
 
-            for (let dayOffset = 0; dayOffset < 5; dayOffset++) { // Pon-Pt
+            for (let dayOffset = 0; dayOffset < 5; dayOffset++) {
                 const currentDate = new Date(mondayDate);
                 currentDate.setDate(mondayDate.getDate() + dayOffset);
                 const dateStr = formatDate(currentDate);
 
-                // Stała ilość zdarzeń dla każdego dnia tygodnia
                 const dayEventCount = 3 + ((dayOffset * 3) % 3);
 
                 for (let j = 0; j < dayEventCount; j++) {
@@ -541,7 +609,6 @@
                     const timeDate = new Date(currentDate);
                     timeDate.setHours(ev.hour, ev.min, 0, 0);
 
-                    // Deterministyczna kalkulacja prognozy i wartości poprzedniej
                     const valCalc = ((seedBase / 100000) + dayOffset + j * 7) % 5 - 2;
                     const forecastVal = valCalc.toFixed(1) + '%';
                     const prevVal = (valCalc - 0.2).toFixed(1) + '%';
@@ -675,7 +742,7 @@
             renderCalendar();
         }
 
-        // --- 3. OBSŁUGA DZIENNIKA TRADINGU MT5 ---
+        // --- 3. OBSŁUGA DZIENNIKA TRADINGU I CHMURY ---
         let trades = JSON.parse(localStorage.getItem('zpp_mt5_trades')) || [];
         let selectedDirection = 'LONG';
         let activeClosingTradeId = null;
@@ -691,9 +758,28 @@
             'DEFAULT': 100000
         };
 
-        function saveTradesToStorage() {
+        async function saveTradesToStorage() {
             localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
             renderJournal();
+
+            // Synchronizacja do Supabase (jeśli połączone)
+            if (db && currentActiveCode) {
+                await db.from('trades').delete().eq('sync_code', currentActiveCode);
+                const cloudPayload = trades.map(t => ({ ...t, sync_code: currentActiveCode }));
+                if (cloudPayload.length > 0) {
+                    await db.from('trades').insert(cloudPayload);
+                }
+            }
+        }
+
+        async function loadTradesFromCloud() {
+            if (!db || !currentActiveCode) return;
+            const { data, error } = await db.from('trades').select('*').eq('sync_code', currentActiveCode);
+            if (!error && data) {
+                trades = data;
+                localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
+                renderJournal();
+            }
         }
 
         function switchJournalTab(tab) {
@@ -982,7 +1068,15 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchEconomicCalendar();
-            renderJournal();
+
+            // Auto-logowanie
+            const savedCode = localStorage.getItem('zpp_saved_sync_code');
+            if (savedCode) {
+                document.getElementById('user-sync-code').value = savedCode;
+                loginWithCode();
+            } else {
+                renderJournal();
+            }
         });
     </script>
 </body>
