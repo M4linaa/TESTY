@@ -36,6 +36,13 @@
             color: #e5e7eb;
         }
 
+        /* Przycisk filtra aktywny */
+        .filter-btn.active {
+            background-color: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+        }
+
         /* Ukrywanie nieaktywnych sekcji */
         .tab-content {
             display: none;
@@ -67,26 +74,11 @@
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
             {
             "symbols": [
-                {
-                "proName": "OANDA:XAUUSD",
-                "title": "ZŁOTO"
-                },
-                {
-                "proName": "BYBIT:BTCUSDT",
-                "title": "BTCUSD"
-                },
-                {
-                "proName": "OANDA:NAS100USD",
-                "title": "NAS100"
-                },
-                {
-                "proName": "FOREXCOM:GER40",
-                "title": "GER40"
-                },
-                {
-                "proName": "FX:US30",
-                "title": "US30"
-                }
+                { "proName": "OANDA:XAUUSD", "title": "ZŁOTO" },
+                { "proName": "BYBIT:BTCUSDT", "title": "BTCUSD" },
+                { "proName": "OANDA:NAS100USD", "title": "NAS100" },
+                { "proName": "FOREXCOM:GER40", "title": "GER40" },
+                { "proName": "FOREXCOM:US30", "title": "US30" }
             ],
             "showSymbolLogo": true,
             "isTransparent": true,
@@ -205,10 +197,44 @@
 
             <!-- 2. Kalendarz Ekonomiczny -->
             <section id="tab-kalendarz" class="tab-content active">
-                <h2 class="text-2xl font-bold text-white mb-1">Kalendarz ekonomiczny</h2>
-                <p class="text-sm text-gray-500 mb-6">Kluczowe wydarzenia makro na ten tydzień</p>
-                <div class="border border-dashed border-gray-800 rounded-xl p-12 text-center text-gray-600">
-                    [ Tutaj wkleimy treść dla: Kalendarz Ekonomiczny ]
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-1">Kalendarz ekonomiczny</h2>
+                        <p class="text-sm text-gray-500">Kluczowe wydarzenia makro na ten tydzień</p>
+                    </div>
+
+                    <!-- Filtry Wpływu Wydarzeń -->
+                    <div class="flex items-center gap-2 bg-[#0d131f] p-1.5 rounded-lg border border-gray-800 text-xs">
+                        <button onclick="filterImpact('all')" id="filter-all" class="filter-btn active px-3 py-1.5 rounded-md font-medium transition-all">Wszystkie</button>
+                        <button onclick="filterImpact('medium')" id="filter-medium" class="filter-btn px-3 py-1.5 rounded-md font-medium text-amber-400 hover:bg-amber-500/10 transition-all">Średni+</button>
+                        <button onclick="filterImpact('high')" id="filter-high" class="filter-btn px-3 py-1.5 rounded-md font-medium text-rose-400 hover:bg-rose-500/10 transition-all">Wysoki</button>
+                    </div>
+                </div>
+
+                <!-- Tabela Kalendarza -->
+                <div class="bg-[#090d14] rounded-xl border border-gray-800/80 overflow-hidden shadow-xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#0c1019] text-xs uppercase tracking-wider text-gray-500 border-b border-gray-800">
+                                <tr>
+                                    <th class="py-3.5 px-5 font-semibold">Czas</th>
+                                    <th class="py-3.5 px-5 font-semibold">Waluta</th>
+                                    <th class="py-3.5 px-5 font-semibold">Wydarzenie</th>
+                                    <th class="py-3.5 px-5 font-semibold text-center">Wpływ</th>
+                                    <th class="py-3.5 px-5 font-semibold text-right">Prognoza</th>
+                                    <th class="py-3.5 px-5 font-semibold text-right">Poprzednio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendar-body" class="divide-y divide-gray-800/50">
+                                <tr>
+                                    <td colspan="6" class="py-12 text-center text-gray-500">
+                                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-emerald-500"></i>
+                                        <p>Ładowanie wydarzeń rynkowych...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -341,29 +367,131 @@
         </main>
     </div>
 
-    <!-- SKRYPT DO OBSŁUGI KLIKANIA W ZAKŁADKI -->
+    <!-- SKRYPT OBSŁUGI ZAKŁADEK I KALENDARZA EKONOMICZNEGO -->
     <script>
+        // Switcher zakładek
         function switchTab(tabId) {
-            // Ukryj wszystkie sekcje treści
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
 
-            // Odznacz wszystkie przyciski w menu
             const buttons = document.querySelectorAll('.nav-link');
             buttons.forEach(button => button.classList.remove('active'));
 
-            // Pokaż wybraną sekcję
             const activeContent = document.getElementById('tab-' + tabId);
             if (activeContent) {
                 activeContent.classList.add('active');
             }
 
-            // Podświetl wybrany przycisk w menu
             const activeButton = document.getElementById('btn-' + tabId);
             if (activeButton) {
                 activeButton.classList.add('active');
             }
         }
+
+        // --- SKRYPT KALENDARZA EKONOMICZNEGO (OPCJA A) ---
+        let currentCalendarData = [];
+        let activeImpactFilter = 'all';
+
+        async function fetchEconomicCalendar() {
+            const container = document.getElementById('calendar-body');
+
+            try {
+                // Zapytanie do API (Możesz tu podmienić URL na własny serwer / API)
+                const response = await fetch('https://finnhub.io/api/v1/economic-calendar?token=demo');
+                
+                if (!response.ok) throw new Error('Nie udało się pobrać danych');
+
+                const rawData = await response.json();
+                
+                // Mapowanie danych do spójnego formatu
+                currentCalendarData = (rawData.economicCalendar || []).map(item => ({
+                    time: item.time ? item.time.substring(11, 16) : '--:--',
+                    currency: item.country || 'USD',
+                    event: item.event || 'Wydarzenie Makro',
+                    impact: item.impact ? item.impact.toLowerCase() : 'low',
+                    forecast: item.estimate !== null && item.estimate !== undefined ? item.estimate : '-',
+                    previous: item.prev !== null && item.prev !== undefined ? item.prev : '-'
+                }));
+
+                renderCalendarTable();
+            } catch (error) {
+                // W przypadku błędu sieci/API - render danych demonstracyjnych
+                console.warn('Użycie danych zapasowych:', error);
+                currentCalendarData = getFallbackCalendarData();
+                renderCalendarTable();
+            }
+        }
+
+        function renderCalendarTable() {
+            const container = document.getElementById('calendar-body');
+            container.innerHTML = '';
+
+            const filteredData = currentCalendarData.filter(item => {
+                if (activeImpactFilter === 'high') return item.impact === 'high';
+                if (activeImpactFilter === 'medium') return item.impact === 'high' || item.impact === 'medium';
+                return true;
+            });
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-gray-500">
+                            Brak wydarzeń spełniających wybrane kryteria.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            filteredData.forEach(item => {
+                let badge = '';
+                if (item.impact === 'high') {
+                    badge = `<span class="px-2.5 py-1 text-[11px] font-semibold rounded bg-rose-950/80 text-rose-400 border border-rose-800/50">Wysoki</span>`;
+                } else if (item.impact === 'medium') {
+                    badge = `<span class="px-2.5 py-1 text-[11px] font-semibold rounded bg-amber-950/80 text-amber-400 border border-amber-800/50">Średni</span>`;
+                } else {
+                    badge = `<span class="px-2.5 py-1 text-[11px] font-semibold rounded bg-gray-800/80 text-gray-400 border border-gray-700/50">Niski</span>`;
+                }
+
+                const row = `
+                    <tr class="hover:bg-gray-800/30 transition-colors">
+                        <td class="py-3.5 px-5 text-gray-300 font-mono text-xs">${item.time}</td>
+                        <td class="py-3.5 px-5 font-bold text-gray-200">${item.currency}</td>
+                        <td class="py-3.5 px-5 text-gray-300 font-medium">${item.event}</td>
+                        <td class="py-3.5 px-5 text-center">${badge}</td>
+                        <td class="py-3.5 px-5 text-right text-gray-300 font-mono text-xs">${item.forecast}</td>
+                        <td class="py-3.5 px-5 text-right text-gray-400 font-mono text-xs">${item.previous}</td>
+                    </tr>
+                `;
+                container.innerHTML += row;
+            });
+        }
+
+        function filterImpact(level) {
+            activeImpactFilter = level;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('filter-' + level).classList.add('active');
+
+            renderCalendarTable();
+        }
+
+        function getFallbackCalendarData() {
+            return [
+                { time: "10:15", currency: "ALL", event: "BRICS Summit", impact: "low", forecast: "-", previous: "-" },
+                { time: "11:01", currency: "CNY", event: "M2 Money Supply y/y", impact: "low", forecast: "7.6%", previous: "7.7%" },
+                { time: "14:30", currency: "CAD", event: "CPI m/m", impact: "high", forecast: "-0.1%", previous: "0.5%" },
+                { time: "14:30", currency: "CAD", event: "Median CPI y/y", impact: "high", forecast: "2.0%", previous: "2.0%" },
+                { time: "14:30", currency: "CAD", event: "Common CPI y/y", impact: "medium", forecast: "2.7%", previous: "2.7%" },
+                { time: "16:00", currency: "USD", event: "Existing Home Sales", impact: "medium", forecast: "3.95M", previous: "3.90M" }
+            ];
+        }
+
+        // Inicjalizacja przy ładowaniu
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchEconomicCalendar();
+            // Odświeżanie co 5 minut
+            setInterval(fetchEconomicCalendar, 300000);
+        });
     </script>
 </body>
 </html>
