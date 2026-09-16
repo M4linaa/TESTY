@@ -500,7 +500,7 @@
             } catch (err) {
                 errorEl.textContent = 'Błąd połączenia z bazą danych!';
                 errorEl.classList.remove('hidden');
-            } font-semibold {
+            } finally {
                 btn.textContent = 'Odblokuj Dostęp';
             }
         }
@@ -626,7 +626,8 @@
             const toStr = formatDate(sunday);
 
             try {
-                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(`https://www.dailyfx.com/api/v1/calendar?startDate=${fromStr}&endDate=${toStr}`)}`);
+                const targetUrl = encodeURIComponent(`https://www.dailyfx.com/api/v1/calendar?startDate=${fromStr}&endDate=${toStr}`);
+                const res = await fetch(`https://corsproxy.io/?url=${targetUrl}`);
                 if(!res.ok) throw new Error("Błąd pobierania danych");
 
                 const rawEvents = await res.json();
@@ -845,9 +846,8 @@
 
             if (db) {
                 try {
-                    await db.from('trades').delete().neq('id', 0);
                     if (trades.length > 0) {
-                        await db.from('trades').insert(trades);
+                        await db.from('trades').upsert(trades);
                     }
                 } catch (e) {
                     console.error("Błąd synchronizacji z Supabase:", e);
@@ -992,9 +992,18 @@
             closeCloseTradeModal();
         }
 
-        function deleteTrade(id) {
+        async function deleteTrade(id) {
             trades = trades.filter(t => t.id !== id);
-            saveTradesToStorage();
+            localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
+            renderJournal();
+
+            if (db) {
+                try {
+                    await db.from('trades').delete().eq('id', id);
+                } catch (e) {
+                    console.error("Błąd usuwania wpisu z Supabase:", e);
+                }
+            }
         }
 
         function renderJournal() {
