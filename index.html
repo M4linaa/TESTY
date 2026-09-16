@@ -228,35 +228,8 @@
                 </div>
             </section>
 
-            <!-- Sekcja Dziennika Tradingu MT5 Z PANELAMI AUTH / ADMINA -->
+            <!-- Sekcja Dziennika Tradingu MT5 -->
             <section id="tab-dziennik" class="tab-content">
-                <!-- SEKCJA LOGOWANIA KODEM -->
-                <div class="bg-[#0d131f] border border-gray-800/80 rounded-xl p-4 mb-6">
-                    <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-key text-cyan-400"></i> Dostęp i Synchronizacja Chmury
-                    </h3>
-                    <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <input type="text" id="user-sync-code" placeholder="Wpisz 32-znakowy kod dostępu..." class="w-full bg-[#06090e] border border-gray-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
-                        <button onclick="loginWithCode()" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all whitespace-nowrap">
-                            Zaloguj i synchronizuj
-                        </button>
-                    </div>
-                    <p id="auth-status" class="text-[11px] mt-2 font-medium"></p>
-                </div>
-
-                <!-- SEKCJA UKRYTEGO PANELU ADMINA (POJAWIA SIĘ TYLKO DLA ADMINA) -->
-                <div id="admin-panel" class="hidden bg-rose-950/30 border border-rose-800/50 rounded-xl p-4 mb-6">
-                    <h3 class="text-sm font-bold text-rose-400 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-user-shield"></i> Panel Administratora (Generowanie Kluczy)
-                    </h3>
-                    <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <button onclick="generateNewUserCode()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all whitespace-nowrap">
-                            Wygeneruj nowy kod dostępu (32 znaki)
-                        </button>
-                        <input type="text" id="new-generated-code" readonly placeholder="Kliknij przycisk obok..." class="w-full bg-[#06090e] border border-gray-800 rounded-lg px-3 py-2 text-xs text-emerald-400 font-mono focus:outline-none">
-                    </div>
-                </div>
-
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 class="text-2xl font-bold text-white mb-1">Dziennik tradingu</h2>
@@ -427,51 +400,12 @@
 
     <!-- SKRYPTY APLIKACJI -->
     <script>
-        // --- KONFIGURACJA SUPABASE & AUTH ---
-        const SUPABASE_URL = 'TWOJ_SUPABASE_URL';
-        const SUPABASE_KEY = 'TWOJ_SUPABASE_ANON_KEY';
+        // --- KONFIGURACJA SUPABASE ---
+        const SUPABASE_URL = 'https://tpjfjuqcenbwxwyjodhb.supabase.co';
+        const SUPABASE_KEY = 'Sb_publishable_87pwKpw-bRkVkuayPwQi8w_Mb1lzFGi';
         let db = null;
-        if (typeof supabase !== 'undefined' && SUPABASE_URL !== 'TWOJ_SUPABASE_URL') {
+        if (typeof supabase !== 'undefined') {
             db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        }
-
-        // Twój unikalny 32-znakowy kod administratora
-        const MASTER_ADMIN_CODE = "ADM84K29PX71L903NVQ56R82WM40ZT1Y";
-        let currentActiveCode = "";
-
-        async function loginWithCode() {
-            const inputCode = document.getElementById('user-sync-code').value.trim();
-            const status = document.getElementById('auth-status');
-
-            if (inputCode.length !== 32) {
-                status.innerText = "Nieprawidłowy kod (musi mieć dokładnie 32 znaki).";
-                status.className = "text-[11px] mt-2 font-medium text-rose-500";
-                return;
-            }
-
-            currentActiveCode = inputCode;
-            localStorage.setItem('zpp_saved_sync_code', inputCode);
-
-            if (inputCode === MASTER_ADMIN_CODE) {
-                document.getElementById('admin-panel').classList.remove('hidden');
-                status.innerText = "Zalogowano jako ADMINISTRATOR. Panel wygenerowany.";
-                status.className = "text-[11px] mt-2 font-medium text-emerald-400";
-            } else {
-                document.getElementById('admin-panel').classList.add('hidden');
-                status.innerText = "Dostęp przyznany. Zsynchronizowano z chmurą.";
-                status.className = "text-[11px] mt-2 font-medium text-emerald-400";
-            }
-
-            loadTradesFromCloud();
-        }
-
-        function generateNewUserCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 32; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('new-generated-code').value = result;
         }
 
         // --- 1. OBSŁUGA INTERFEJSU I NAWIGACJI ---
@@ -762,23 +696,30 @@
             localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
             renderJournal();
 
-            // Synchronizacja do Supabase (jeśli połączone)
-            if (db && currentActiveCode) {
-                await db.from('trades').delete().eq('sync_code', currentActiveCode);
-                const cloudPayload = trades.map(t => ({ ...t, sync_code: currentActiveCode }));
-                if (cloudPayload.length > 0) {
-                    await db.from('trades').insert(cloudPayload);
+            // Synchronizacja bezpośrednio z Supabase
+            if (db) {
+                try {
+                    await db.from('trades').delete().neq('id', 0);
+                    if (trades.length > 0) {
+                        await db.from('trades').insert(trades);
+                    }
+                } catch (e) {
+                    console.error("Błąd synchronizacji z Supabase:", e);
                 }
             }
         }
 
         async function loadTradesFromCloud() {
-            if (!db || !currentActiveCode) return;
-            const { data, error } = await db.from('trades').select('*').eq('sync_code', currentActiveCode);
-            if (!error && data) {
-                trades = data;
-                localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
-                renderJournal();
+            if (!db) return;
+            try {
+                const { data, error } = await db.from('trades').select('*');
+                if (!error && data && data.length > 0) {
+                    trades = data;
+                    localStorage.setItem('zpp_mt5_trades', JSON.stringify(trades));
+                    renderJournal();
+                }
+            } catch (e) {
+                console.error("Błąd pobierania danych z Supabase:", e);
             }
         }
 
@@ -1068,15 +1009,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchEconomicCalendar();
-
-            // Auto-logowanie
-            const savedCode = localStorage.getItem('zpp_saved_sync_code');
-            if (savedCode) {
-                document.getElementById('user-sync-code').value = savedCode;
-                loginWithCode();
-            } else {
-                renderJournal();
-            }
+            renderJournal();
+            loadTradesFromCloud();
         });
     </script>
 </body>
